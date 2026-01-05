@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Parking Adaptado</title>
+    <style>
+        /* Estilos CSS */
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f0f0; margin: 0; }
+        .contenedor-principal { width: 90%; max-width: 900px; text-align: center; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .panel-plazas { display: flex; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        
+        /* CUADROS MÁS PEQUEÑOS (100px ancho / 80px alto) */
+        .plaza-caja { 
+            width: 100px; 
+            height: 80px;  
+            margin: 8px; 
+            padding: 10px; 
+            border-radius: 6px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            color: white; 
+            transition: background-color 0.3s; 
+            position: relative; 
+        }
+        
+        /* Colores */
+        .libre { background-color: #4CAF50; /* Verde */ }
+        .ocupada { background-color: #F44336; /* Rojo */ }
+        .error { background-color: #FFC107; /* Amarillo/Naranja, si no hay conexión */ }
+        
+        /* Estilo para el separador visual entre grupos */
+        .plaza-caja:nth-child(2n+1) { border-left: 2px solid #555; } 
+
+        /* Letras más pequeñas para los cuadros reducidos */
+        .adaptada-etiqueta { font-size: 0.7em; font-weight: bold; background-color: #008CBA; padding: 1px 4px; border-radius: 3px; margin-top: 2px; }
+        .nombre-grupo { font-size: 0.8em; position: absolute; top: 2px; left: 5px; opacity: 0.7; }
+        .nombre-plaza { font-size: 1.0em; font-weight: bold; }
+        .estado-plaza { font-size: 1.2em; margin-top: 3px; }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor-principal">
+        <h1>Estado del Parking (3 Grupos)</h1>
+        
+        <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" alt="Logo del Parking" style="width:80%; max-width: 600px; margin-bottom: 25px; height: auto;">
+        
+        <p class="estado-global" id="estado-texto">Conectando con Arduino...</p>
+
+        <div class="panel-plazas" id="panel-plazas-contenedor">
+            {% for info in plazas_info %}
+            <div class="plaza-caja error" id="plaza-{{ loop.index }}">
+                <span class="nombre-grupo">{{ info.nombre_grupo }}</span>
+                
+                <span class="nombre-plaza">{{ info.nombre_plaza }}</span>
+                
+                {% if info.tipo %}
+                    <span class="adaptada-etiqueta">{{ info.tipo }}</span>
+                {% endif %}
+                
+                <span class="estado-plaza" id="estado-{{ loop.index }}">ERR</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function actualizarEstado() {
+            // Llama a la API de Flask para obtener la lista de 6 estados
+            fetch('/api/estado')
+                .then(response => response.json())
+                .then(data => {
+                    const estados = data.estados; 
+                    const textoGlobal = document.getElementById('estado-texto');
+                    let plazas_libres = 0;
+
+                    estados.forEach((estado, index) => {
+                        const plazaId = index + 1;
+                        const caja = document.getElementById(`plaza-${plazaId}`);
+                        const estadoTexto = document.getElementById(`estado-${plazaId}`);
+
+                        if (!caja) return; 
+
+                        caja.classList.remove('libre', 'ocupada', 'error');
+
+                        if (estado === 1) {
+                            // LIBRE (Verde)
+                            caja.classList.add('libre');
+                            estadoTexto.textContent = 'LIBRE';
+                            plazas_libres++;
+                        } else if (estado === 0) {
+                            // OCUPADO (Rojo)
+                            caja.classList.add('ocupada');
+                            estadoTexto.textContent = 'OCUPADO';
+                        } else if (estado === -1) {
+                            // ERROR/DESCONECTADO (Amarillo)
+                            caja.classList.add('error');
+                            estadoTexto.textContent = 'ERR';
+                        }
+                    });
+                    
+                    // Actualiza el texto global
+                    if (estados[0] === -1) {
+                        textoGlobal.textContent = 'Estado General: Sin conexión al Arduino (Verifique el puerto COM)';
+                    } else if (plazas_libres === 0) {
+                        textoGlobal.textContent = 'Estado General: Parking LLENO';
+                    } else {
+                         textoGlobal.textContent = `Estado General: ${plazas_libres} plazas LIBRES`;
+                    }
+                })
+                .catch(error => {
+                    const textoGlobal = document.getElementById('estado-texto');
+                    textoGlobal.textContent = 'ERROR: El servidor web está caído o no responde.';
+                });
+        }
+
+        actualizarEstado();
+        setInterval(actualizarEstado, 500); // Actualiza cada 0.5 segundos
+    </script>
+</body>
+</html>
