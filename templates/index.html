@@ -17,22 +17,8 @@
             .side-panel { width: 100%; border-left: none; border-top: 3px solid #444; height: auto; }
         }
 
-        .zona-interactiva { position: absolute; cursor: pointer; transition: 0.3s; background-color: rgba(0, 0, 0, 0.5); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid transparent; }
+        .zona-interactiva { position: absolute; cursor: pointer; transition: 0.3s; background-color: rgba(0, 0, 0, 0.5); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
-        /* --- NUEVOS TAMAÑOS DE CUADROS PARA LA IMAGEN JPG --- */
-        #zona-norte { 
-            border-color: #3498db; color: #3498db; 
-            top: 5%; left: 5%; width: 40%; height: 30%; 
-        }
-        #zona-sur { 
-            border-color: #e74c3c; color: #e74c3c; 
-            top: 40%; left: 5%; width: 40%; height: 30%; 
-        }
-        #zona-central { 
-            border-color: #f39c12; color: #f39c12; 
-            top: 65%; left: 52%; width: 43%; height: 30%; 
-        }
-
         .contenedor-leds { display: flex; gap: 8px; margin-top: 5px; }
         .led { width: 22px; height: 22px; border: 2px solid white; border-radius: 4px; transition: 0.3s; }
         .led-adaptada { border-radius: 50%; }
@@ -49,7 +35,9 @@
         <div class="map-container">
             <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
 
-            <div id="zona-norte" class="zona-interactiva" onclick="mostrarInfo('Zona Norte')">
+            <div id="zona-norte" class="zona-interactiva" 
+                 style="top: 5%; left: 5%; width: 40%; height: 32%; border: 2px solid #3498db; color: #3498db;" 
+                 onclick="mostrarInfo('Zona Norte')">
                 <span style="color:white; font-size:14px; font-weight:bold;">NORTE</span>
                 <div class="contenedor-leds">
                     <div id="led-p2" class="led led-adaptada"></div>
@@ -57,7 +45,9 @@
                 </div>
             </div>
             
-            <div id="zona-sur" class="zona-interactiva" onclick="mostrarInfo('Zona Sur')">
+            <div id="zona-sur" class="zona-interactiva" 
+                 style="top: 40%; left: 5%; width: 40%; height: 28%; border: 2px solid #e74c3c; color: #e74c3c;" 
+                 onclick="mostrarInfo('Zona Sur')">
                 <span style="color:white; font-size:14px; font-weight:bold;">SUR</span>
                 <div class="contenedor-leds">
                     <div id="led-p4" class="led led-adaptada"></div>
@@ -65,7 +55,9 @@
                 </div>
             </div>
 
-            <div id="zona-central" class="zona-interactiva" onclick="mostrarInfo('Zona Central')">
+            <div id="zona-central" class="zona-interactiva" 
+                 style="top: 68%; left: 52%; width: 44%; height: 28%; border: 2px solid #f39c12; color: #f39c12;" 
+                 onclick="mostrarInfo('Zona Central')">
                 <span style="color:white; font-size:18px; font-weight:bold;">CENTRAL</span>
                 <div class="contenedor-leds">
                     <div id="led-p6" class="led led-adaptada"></div>
@@ -76,8 +68,9 @@
     </div>
 
     <div class="side-panel">
-        <h2 style="margin-top:0; color: #3498db;">Estado Parking</h2>
-        <div id="detalle-zona"></div>
+        <h2 style="margin-top:0; color: #3498db; font-size: 1.4em;">Estado Parking</h2>
+        <div id="detalle-zona">
+            </div>
     </div>
 
     <script>
@@ -98,16 +91,20 @@
         function dibujarPanel() {
             if (!zonaActual) return;
             const n = zonaActual;
-            let aOcupadas = estadosPines[ (n==="Zona Norte"?"p2":n==="Zona Sur"?"p4":"p6") ];
-            let nOcupadas = estadosPines[ (n==="Zona Norte"?"p3":n==="Zona Sur"?"p5":"p7") ];
+            // Mapeo de pines según la zona
+            let pinAdaptada = (n === "Zona Norte") ? "p2" : (n === "Zona Sur") ? "p4" : "p6";
+            let pinNormal = (n === "Zona Norte") ? "p3" : (n === "Zona Sur") ? "p5" : "p7";
+            
+            let aOcupadas = estadosPines[pinAdaptada];
+            let nOcupadas = estadosPines[pinNormal];
 
             document.getElementById('detalle-zona').innerHTML = `
                 <div class="stat-box" style="border-color: ${CONFIG[n].color}">
                     <h3 style="margin:0; color:${CONFIG[n].color}">${n}</h3>
-                    <p style="margin:15px 0 5px 0; color:#bbb;">PLAZAS LIBRES</p>
+                    <p style="margin:15px 0 5px 0; color:#bbb; font-size:0.9em;">PLAZAS LIBRES</p>
                     <span class="big-num">${CONFIG[n].totales - nOcupadas}</span>
                     <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
-                    <p style="margin:0; color:#bbb;">PLAZAS ADAPTADAS</p>
+                    <p style="margin:0; color:#bbb; font-size:0.9em;">PLAZAS ADAPTADAS</p>
                     <span class="big-num" style="color:#3498db">${CONFIG[n].adaptadas - aOcupadas}</span>
                 </div>`;
         }
@@ -117,17 +114,21 @@
                 .then(res => res.json())
                 .then(data => {
                     estadosPines = data;
+                    // Actualizar colores de los LEDs visuales
                     for (let i = 2; i <= 7; i++) {
                         const led = document.getElementById('led-p' + i);
                         if (led) {
-                            led.className = (led.classList.contains('led-adaptada') ? 'led led-adaptada ' : 'led ') + 
-                                            (data['p' + i] === 1 ? 'led-on' : 'led-off');
+                            const estaOcupado = (data['p' + i] === 1);
+                            led.classList.toggle('led-on', estaOcupado);
+                            led.classList.toggle('led-off', !estaOcupado);
                         }
                     }
                     dibujarPanel();
-                });
+                })
+                .catch(err => console.error("Error en fetch:", err));
         }
 
+        // Actualizar cada 2 segundos
         setInterval(actualizar, 2000);
         actualizar();
     </script>
