@@ -5,54 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Parking Ociopia</title>
     <style>
+        /* CONFIGURACIÓN BASE */
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background-color: #1a1a1a; color: white; margin: 0; 
             display: flex; height: 100vh; overflow: hidden;
         }
 
-        .contenedor-principal { flex: 1; position: relative; overflow: auto; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        /* CONTENEDOR DEL MAPA (IZQUIERDA) */
+        .contenedor-principal { 
+            flex: 1; position: relative; overflow: auto; 
+            display: flex; justify-content: center; align-items: center; 
+            padding: 20px; background-color: #121212;
+        }
 
-        .map-container { position: relative; display: inline-block; line-height: 0; background: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .map-container { 
+            position: relative; display: inline-block; line-height: 0; 
+            background: white; border-radius: 10px; box-shadow: 0 0 25px rgba(0,0,0,0.7); 
+        }
 
-        .map-image { display: block; max-width: 85vw; max-height: 85vh; border-radius: 8px; }
+        .map-image { 
+            display: block; max-width: 100%; height: auto; max-height: 85vh; border-radius: 8px; 
+        }
 
-        /* PANEL DERECHO */
+        /* PANEL DE INFORMACIÓN (DERECHA) */
         .side-panel {
             width: 350px; background: #252525; border-left: 3px solid #444;
             padding: 25px; box-sizing: border-box; display: flex; flex-direction: column;
+            z-index: 10;
         }
 
-        /* ZONAS (TUS COORDENADAS ACTUALIZADAS) */
+        /* --- MODO MÓVIL (PANTALLAS PEQUEÑAS) --- */
+        @media (max-width: 850px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .contenedor-principal { height: 60vh; flex: none; }
+            .side-panel { width: 100%; border-left: none; border-top: 3px solid #444; height: auto; }
+            .map-image { max-height: 50vh; }
+        }
+
+        /* ZONAS INTERACTIVAS (COORDENADAS) */
         .zona-interactiva {
             position: absolute; cursor: pointer; transition: 0.3s;
             background-color: rgba(0, 0, 0, 0.6); border-radius: 8px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; border: 2px solid transparent;
         }
-        .zona-interactiva:hover { background-color: rgba(0, 0, 0, 0.8); }
+        .zona-interactiva:hover { background-color: rgba(0, 0, 0, 0.8); transform: scale(1.02); }
 
-        #zona-norte { border: 3px solid #3498db; color: #3498db; }
-        #zona-sur { border: 3px solid #e74c3c; color: #e74c3c; }
-        #zona-central { border: 3px solid #f39c12; color: #f39c12; }
+        #zona-norte { border-color: #3498db; color: #3498db; }
+        #zona-sur { border-color: #e74c3c; color: #e74c3c; }
+        #zona-central { border-color: #f39c12; color: #f39c12; }
 
-        .label-zona { font-size: 14px; font-weight: bold; color: white; margin: 2px 0; text-transform: uppercase; }
-        .info-mini { font-size: 10px; color: #ccc; margin-bottom: 5px; }
+        .label-zona { font-size: 13px; font-weight: bold; color: white; margin: 2px 0; text-transform: uppercase; }
+        .info-mini { font-size: 9px; color: #ccc; margin-bottom: 5px; }
 
-        .contenedor-leds { display: flex; gap: 10px; }
-        .led { width: 20px; height: 20px; border: 2px solid white; border-radius: 4px; }
+        /* LEDS */
+        .contenedor-leds { display: flex; gap: 8px; }
+        .led { width: 18px; height: 18px; border: 2px solid white; border-radius: 4px; }
         .led-adaptada { border-radius: 50%; }
-        
-        /* ESTADOS LED */
-        .led-off { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; } /* Libre */
-        .led-on { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }   /* Ocupado */
+        .led-off { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+        .led-on { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
         .led-error { background-color: #555; }
 
-        /* PANEL DE DETALLE */
-        .stat-box { background: #333; padding: 20px; border-radius: 12px; margin-top: 20px; border-top: 6px solid #666; }
-        .stat-item { margin-bottom: 15px; }
-        .stat-item:last-child { margin-bottom: 0; }
-        .big-num { font-size: 2.2em; font-weight: bold; color: #2ecc71; display: block; line-height: 1; margin-top: 5px; }
-        .txt-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+        /* DISEÑO PANEL DERECHO */
+        .stat-box { background: #333; padding: 20px; border-radius: 12px; margin-top: 15px; border-top: 6px solid #666; }
+        .big-num { font-size: 2.2em; font-weight: bold; color: #2ecc71; display: block; margin-top: 5px; }
+        .txt-label { font-size: 0.85em; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -80,8 +98,8 @@
             </div>
 
             <div id="zona-central" class="zona-interactiva" style="top: 60%; left: 0%; width: 70%; height: 39%;" onclick="mostrarInfo('Zona Central')">
-                <p class="label-zona" style="font-size: 20px;">CENTRAL</p>
-                <p class="info-mini" style="font-size: 14px;">Total plazas: 198</p>
+                <p class="label-zona" style="font-size: 18px;">CENTRAL</p>
+                <p class="info-mini" style="font-size: 12px;">Total plazas: 198</p>
                 <div class="contenedor-leds">
                     <div id="led-p6" class="led led-adaptada led-error"></div>
                     <div id="led-p7" class="led led-error"></div>
@@ -91,18 +109,18 @@
     </div>
 
     <div class="side-panel">
-        <h2 style="margin-top:0; color: #3498db;">Estado del Sector</h2>
+        <h2 style="margin-top:0; color: #3498db; font-size: 1.5em;">Parking Inteligente</h2>
         <div id="detalle-zona">
-            <p style="color: #888; font-style: italic;">Selecciona una zona en el mapa para ver la disponibilidad.</p>
+            <p style="color: #888; font-style: italic;">Selecciona una zona en el mapa para ver plazas libres.</p>
         </div>
         
-        <div style="margin-top: auto; padding: 15px; background: #1a1a1a; border-radius: 8px; border: 1px solid #333;">
-            <p style="margin:0 0 10px 0; font-size: 12px; font-weight: bold; color: #888;">LEYENDA:</p>
-            <div style="display: flex; align-items: center; font-size: 11px; margin-bottom: 5px;">
-                <div class="led led-adaptada led-off" style="width:12px; height:12px; margin-right:8px;"></div> Plazas Adaptadas (♿)
+        <div style="margin-top: auto; padding: 15px; background: #1a1a1a; border-radius: 8px; border: 1px solid #333; font-size: 0.8em;">
+            <p style="margin:0 0 8px 0; color: #888; font-weight: bold;">Simbología:</p>
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div class="led led-adaptada led-off" style="width:12px; height:12px; margin-right:8px; border-width: 1px;"></div> Plazas Adaptadas (♿)
             </div>
-            <div style="display: flex; align-items: center; font-size: 11px;">
-                <div class="led led-off" style="width:12px; height:12px; margin-right:8px;"></div> Plazas Generales
+            <div style="display: flex; align-items: center;">
+                <div class="led led-off" style="width:12px; height:12px; margin-right:8px; border-width: 1px;"></div> Plazas Generales
             </div>
         </div>
     </div>
@@ -125,17 +143,14 @@
             const detalle = document.getElementById('detalle-zona');
             detalle.innerHTML = `
                 <div class="stat-box" style="border-color: ${CONFIG[nombre].color}">
-                    <h3 style="margin:0 0 20px 0; color:${CONFIG[nombre].color}; text-transform: uppercase;">${nombre}</h3>
-                    
+                    <h3 style="margin:0 0 15px 0; color:${CONFIG[nombre].color};">${nombre}</h3>
                     <div class="stat-item">
-                        <span class="txt-label">Plazas libres</span>
+                        <span class="txt-label">Libres (Generales)</span>
                         <span class="big-num">${CONFIG[nombre].totales - (nOcupadas || 0)}</span>
                     </div>
-                    
                     <div style="height:1px; background:#444; margin:15px 0;"></div>
-                    
                     <div class="stat-item">
-                        <span class="txt-label">Plazas adaptadas ♿</span>
+                        <span class="txt-label">Libres (Adaptadas) ♿</span>
                         <span class="big-num" style="color:#3498db">${CONFIG[nombre].adaptadas - (aOcupadas || 0)}</span>
                     </div>
                 </div>
@@ -143,20 +158,23 @@
         }
 
         function actualizar() {
-            fetch('/status').then(res => res.json()).then(data => {
-                estadosPines = data;
-                for (let i = 2; i <= 7; i++) {
-                    const led = document.getElementById('led-p' + i);
-                    if (led) {
-                        led.className = 'led ' + (led.classList.contains('led-adaptada') ? 'led-adaptada ' : '') + 
-                            (data['p' + i] === 1 ? 'led-on' : (data['p' + i] === 0 ? 'led-off' : 'led-error'));
+            fetch('/status')
+                .then(res => res.json())
+                .then(data => {
+                    estadosPines = data;
+                    for (let i = 2; i <= 7; i++) {
+                        const led = document.getElementById('led-p' + i);
+                        if (led) {
+                            led.className = 'led ' + (led.classList.contains('led-adaptada') ? 'led-adaptada ' : '') + 
+                                (data['p' + i] === 1 ? 'led-on' : (data['p' + i] === 0 ? 'led-off' : 'led-error'));
+                        }
                     }
-                }
-            }).catch(err => console.log("Esperando conexión con Arduino..."));
+                })
+                .catch(err => console.log("Buscando datos del servidor..."));
         }
+
         setInterval(actualizar, 2000);
         actualizar();
     </script>
 </body>
 </html>
-
