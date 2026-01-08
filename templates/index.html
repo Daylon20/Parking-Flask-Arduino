@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Parking - Mapa Interactivo Adaptado</title>
+    <title>Smart Parking Ociopia - Zonas Interactivas</title>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             text-align: center; 
             background-color: #1a1a1a; 
-            color: white;
-            margin: 0;
-            padding: 20px;
+            color: white; margin: 0; padding: 20px;
         }
 
         .map-container {
@@ -20,7 +18,6 @@
             margin: 20px auto;
             border: 4px solid #3498db;
             border-radius: 12px;
-            box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
             background-color: white;
             line-height: 0;
         }
@@ -28,41 +25,32 @@
         .map-image {
             display: block;
             max-width: 95vw;
-            max-height: 70vh;
+            max-height: 75vh;
             border-radius: 8px;
         }
 
-        /* Estilo general de las plazas */
-        .plaza {
+        /* ESTILO DE LAS ÁREAS DELIMITADAS */
+        .zona-interactiva {
             position: absolute;
-            width: 32px;
-            height: 32px;
-            border: 2px solid white;
-            border-radius: 6px;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            line-height: 32px;
-            text-align: center;
-            color: white;
+            border: 3px dashed rgba(255,255,255,0.5);
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
         }
 
-        /* Clase especial para plazas adaptadas */
-        .adaptada {
-            border: 2px solid #0056b3;
-            border-radius: 50%; /* Las hacemos circulares para que destaquen */
+        .zona-interactiva:hover {
+            border-style: solid;
+            background-color: rgba(52, 152, 219, 0.2);
         }
 
-        .plaza:hover { transform: scale(1.3); z-index: 100; }
-
-        /* Estados de color */
-        .libre { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
-        .ocupado { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
-        .error { background-color: #f1c40f; box-shadow: 0 0 15px #f1c40f; }
-        /* Si la adaptada está libre, usamos un azul brillante */
-        .adaptada.libre { background-color: #3498db; box-shadow: 0 0 15px #3498db; }
+        /* Colores dinámicos para las zonas */
+        .estado-libre { background-color: rgba(46, 204, 113, 0.3); border-color: #2ecc71; }
+        .estado-alerta { background-color: rgba(231, 76, 60, 0.3); border-color: #e74c3c; }
+        .estado-error { background-color: rgba(241, 196, 15, 0.3); border-color: #f1c40f; }
 
         #info-panel {
             max-width: 450px;
@@ -73,91 +61,103 @@
             border-radius: 10px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             display: none;
-            border-top: 5px solid #0056b3;
+            border-top: 8px solid #3498db;
         }
     </style>
 </head>
 <body>
 
-    <h1>Sistema de Parking Inteligente ♿</h1>
-    <p>Las plazas circulares azules son <b>adaptadas para movilidad reducida</b>.</p>
+    <h1>Parking Ociopia - Mapa por Sectores</h1>
+    <p>Pulsa sobre cualquier área coloreada para ver la disponibilidad real.</p>
 
     <div class="map-container">
         <img src="{{ url_for('static', filename='img/logo_parking.png') }}" class="map-image">
 
-        <div id="p2" class="plaza adaptada error" style="top: 15%; left: 85%;" onclick="mostrarInfo('Zona Norte', true)">♿</div>
-        <div id="p3" class="plaza error" style="top: 22%; left: 85%;" onclick="mostrarInfo('Zona Norte', false)">2</div>
+        <div id="zona-norte" class="zona-interactiva estado-error" 
+             style="top: 5%; left: 70%; width: 25%; height: 30%;" 
+             onclick="mostrarInfo('Zona Norte')">SECTOR NORTE</div>
         
-        <div id="p4" class="plaza adaptada error" style="top: 70%; left: 85%;" onclick="mostrarInfo('Zona Sur', true)">♿</div>
-        <div id="p5" class="plaza error" style="top: 77%; left: 85%;" onclick="mostrarInfo('Zona Sur', false)">2</div>
+        <div id="zona-sur" class="zona-interactiva estado-error" 
+             style="top: 60%; left: 55%; width: 40%; height: 35%;" 
+             onclick="mostrarInfo('Zona Sur')">SECTOR SUR</div>
 
-        <div id="p6" class="plaza adaptada error" style="top: 45%; left: 45%;" onclick="mostrarInfo('Zona Central', true)">♿</div>
-        <div id="p7" class="plaza error" style="top: 52%; left: 45%;" onclick="mostrarInfo('Zona Central', false)">2</div>
+        <div id="zona-central" class="zona-interactiva estado-error" 
+             style="top: 35%; left: 10%; width: 40%; height: 40%;" 
+             onclick="mostrarInfo('Zona Central')">SECTOR CENTRAL</div>
     </div>
 
     <div id="info-panel">
-        <h2 id="zona-nombre" style="margin-top:0;">Sector</h2>
-        <div id="zona-stats" style="font-size: 1.1em; line-height: 1.6;"></div>
-        <button onclick="document.getElementById('info-panel').style.display='none'" style="margin-top:15px; cursor:pointer; padding:8px 15px; background:#0056b3; color:white; border:none; border-radius:5px;">Entendido</button>
+        <h2 id="zona-nombre" style="margin:0; color:#2c3e50;">Sector</h2>
+        <div id="zona-stats" style="font-size: 1.1em; line-height: 1.6; text-align: left; margin-top: 10px;"></div>
+        <button onclick="document.getElementById('info-panel').style.display='none'" style="margin-top:15px; cursor:pointer; padding:10px; background:#3498db; color:white; border:none; border-radius:5px; width:100%; font-weight:bold;">CERRAR</button>
     </div>
 
     <script>
         const CONFIG = {
-            "Zona Norte": 45,
-            "Zona Sur": 29,
-            "Zona Central": 198
+            "Zona Norte":   { normales: 43, adaptadas: 2 },
+            "Zona Sur":     { normales: 27, adaptadas: 2 },
+            "Zona Central": { normales: 192, adaptadas: 6 }
         };
 
-        function mostrarInfo(nombreZona, esAdaptada) {
-            let ocupadas = 0;
+        // Guardamos los estados de los pines para el cálculo
+        let estadosPines = { p2: null, p3: null, p4: null, p5: null, p6: null, p7: null };
+
+        function mostrarInfo(nombreZona) {
+            let nOcupadas = 0;
+            let aOcupadas = 0;
+
             if (nombreZona === "Zona Norte") {
-                if(document.getElementById('p2').classList.contains('ocupado')) ocupadas++;
-                if(document.getElementById('p3').classList.contains('ocupado')) ocupadas++;
+                if(estadosPines.p2 === 1) aOcupadas++;
+                if(estadosPines.p3 === 1) nOcupadas++;
             } else if (nombreZona === "Zona Sur") {
-                if(document.getElementById('p4').classList.contains('ocupado')) ocupadas++;
-                if(document.getElementById('p5').classList.contains('ocupado')) ocupadas++;
+                if(estadosPines.p4 === 1) aOcupadas++;
+                if(estadosPines.p5 === 1) nOcupadas++;
             } else if (nombreZona === "Zona Central") {
-                if(document.getElementById('p6').classList.contains('ocupado')) ocupadas++;
-                if(document.getElementById('p7').classList.contains('ocupado')) ocupadas++;
+                if(estadosPines.p6 === 1) aOcupadas++;
+                if(estadosPines.p7 === 1) nOcupadas++;
             }
 
-            const disponibles = CONFIG[nombreZona] - ocupadas;
-            const panel = document.getElementById('info-panel');
-            panel.style.display = 'block';
+            const totalN = CONFIG[nombreZona].normales;
+            const totalA = CONFIG[nombreZona].adaptadas;
             
-            let avisoPMR = esAdaptada ? "<p style='color:#0056b3; font-weight:bold;'>⚠️ ESTA ES UNA PLAZA ADAPTADA (♿).<br>Uso exclusivo para personas con movilidad reducida.</p>" : "";
-
+            document.getElementById('info-panel').style.display = 'block';
             document.getElementById('zona-nombre').innerText = nombreZona;
-            document.getElementById('zona-stats').innerHTML = 
-                avisoPMR +
-                `Capacidad total del sector: <b>${CONFIG[nombreZona]}</b><br>` +
-                `Disponibilidad actual: <b style="font-size:1.4em; color:#2ecc71">${disponibles}</b>`;
-            
-            panel.scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('zona-stats').innerHTML = `
+                <div style="border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;">
+                    <b>Plazas Estándar:</b><br>
+                    Disponibles: <span style="color:#2ecc71; font-weight:bold">${totalN - nOcupadas}</span> de ${totalN}
+                </div>
+                <div>
+                    <b style="color:#0056b3;">Plazas Adaptadas (♿):</b><br>
+                    Disponibles: <span style="color:#3498db; font-weight:bold">${totalA - aOcupadas}</span> de ${totalA}
+                </div>
+            `;
         }
 
         function actualizarDatos() {
             fetch('/status')
                 .then(response => response.json())
                 .then(data => {
-                    for (let i = 2; i <= 7; i++) {
-                        let id = "p" + i;
-                        let element = document.getElementById(id);
-                        if (!element) continue;
+                    estadosPines = data; // Guardamos los datos nuevos
+                    
+                    // Actualizar colores de las áreas
+                    actualizarColorZona('zona-norte', data.p2, data.p3);
+                    actualizarColorZona('zona-sur', data.p4, data.p5);
+                    actualizarColorZona('zona-central', data.p6, data.p7);
+                });
+        }
 
-                        let estado = data[id]; 
-                        element.classList.remove('libre', 'ocupado', 'error');
-
-                        if (estado === 1) {
-                            element.classList.add('ocupado');
-                        } else if (estado === 0) {
-                            element.classList.add('libre');
-                        } else {
-                            element.classList.add('error');
-                        }
-                    }
-                })
-                .catch(err => console.error("Error:", err));
+        function actualizarColorZona(idDiv, pinA, pinN) {
+            const el = document.getElementById(idDiv);
+            el.classList.remove('estado-libre', 'estado-alerta', 'estado-error');
+            
+            if (pinA === null || pinN === null) {
+                el.classList.add('estado-error');
+            } else if (pinA === 1 || pinN === 1) {
+                el.classList.add('estado-alerta'); // Si hay alguien, se pone rojizo
+            } else {
+                el.classList.add('estado-libre'); // Si todo está libre, verde
+            }
         }
 
         setInterval(actualizarDatos, 2000);
