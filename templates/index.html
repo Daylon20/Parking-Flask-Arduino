@@ -5,29 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Parking Ociopia</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        .contenedor-principal { flex: 1; position: relative; overflow: auto; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        /* ESTILO GENERAL */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #1a1a1a; color: white; margin: 0; 
+            display: flex; height: 100vh; overflow: hidden;
+        }
+
+        .contenedor-principal { 
+            flex: 1; position: relative; overflow: auto; 
+            display: flex; justify-content: center; align-items: center; padding: 20px; 
+        }
+
         .map-container { position: relative; display: inline-block; background: white; border-radius: 10px; }
-        .map-image { display: block; max-width: 100%; height: auto; max-height: 85vh; border-radius: 8px; }
-        .side-panel { width: 350px; background: #252525; border-left: 3px solid #444; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; }
         
+        /* La imagen ahora busca el archivo .jpg */
+        .map-image { display: block; max-width: 100%; height: auto; max-height: 85vh; border-radius: 8px; }
+
+        .side-panel {
+            width: 350px; background: #252525; border-left: 3px solid #444;
+            padding: 25px; box-sizing: border-box; display: flex; flex-direction: column;
+        }
+
+        /* DISEÑO PARA MÓVILES */
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; height: auto; }
             .contenedor-principal { height: 60vh; flex: none; }
             .side-panel { width: 100%; border-left: none; border-top: 3px solid #444; height: auto; }
         }
 
-        .zona-interactiva { position: absolute; cursor: pointer; transition: 0.3s; background-color: rgba(0, 0, 0, 0.6); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid transparent; }
-        #zona-norte { border-color: #3498db; color: #3498db; top: 3%; left: 83%; width: 16%; height: 30%; }
-        #zona-sur { border-color: #e74c3c; color: #e74c3c; top: 40%; left: 83%; width: 16%; height: 20%; }
-        #zona-central { border-color: #f39c12; color: #f39c12; top: 60%; left: 0%; width: 70%; height: 35%; }
+        /* ZONAS SOBRE EL MAPA */
+        .zona-interactiva {
+            position: absolute; cursor: pointer; transition: 0.3s;
+            background-color: rgba(0, 0, 0, 0.6); border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
 
+        /* Si al cambiar a la imagen JPG los cuadros no encajan, modifica estos % */
+        #zona-norte { border: 2px solid #3498db; color: #3498db; top: 3%; left: 83%; width: 16%; height: 30%; }
+        #zona-sur { border: 2px solid #e74c3c; color: #e74c3c; top: 40%; left: 83%; width: 16%; height: 20%; }
+        #zona-central { border: 2px solid #f39c12; color: #f39c12; top: 60%; left: 0%; width: 70%; height: 35%; }
+
+        /* ESTILO LEDS */
         .contenedor-leds { display: flex; gap: 8px; margin-top: 5px; }
         .led { width: 18px; height: 18px; border: 2px solid white; border-radius: 4px; transition: 0.3s; }
         .led-adaptada { border-radius: 50%; }
-        .led-off { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
-        .led-on { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
+        .led-off { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; } /* LIBRE */
+        .led-on { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }   /* OCUPADO */
 
+        /* PANEL DERECHO */
         .stat-box { background: #333; padding: 20px; border-radius: 12px; margin-top: 15px; border-top: 6px solid #666; }
         .big-num { font-size: 2.2em; font-weight: bold; color: #2ecc71; display: block; margin-top: 5px; }
     </style>
@@ -36,7 +62,7 @@
 
     <div class="contenedor-principal">
         <div class="map-container">
-            <img src="{{ url_for('static', filename='img/logo_parking.png') }}" class="map-image">
+            <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
 
             <div id="zona-norte" class="zona-interactiva" onclick="mostrarInfo('Zona Norte')">
                 <span style="color:white; font-size:11px; font-weight:bold;">NORTE</span>
@@ -78,7 +104,7 @@
         };
 
         let estadosPines = { p2:0, p3:0, p4:0, p5:0, p6:0, p7:0 };
-        let zonaActual = "Zona Central"; // Por defecto empieza en Central
+        let zonaActual = "Zona Central";
 
         function mostrarInfo(nombre) {
             zonaActual = nombre;
@@ -115,8 +141,7 @@
                         }
                     }
                     dibujarPanel();
-                })
-                .catch(err => console.error("Error cargando estados"));
+                });
         }
 
         setInterval(actualizar, 2000);
