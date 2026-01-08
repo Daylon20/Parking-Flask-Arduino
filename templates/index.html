@@ -3,122 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Parking Adaptado</title>
+    <title>Smart Parking - Mapa Interactivo Adaptado</title>
     <style>
-        /* Estilos CSS */
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f0f0; margin: 0; }
-        .contenedor-principal { width: 90%; max-width: 900px; text-align: center; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .panel-plazas { display: flex; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
-        
-        /* CUADROS MÁS PEQUEÑOS (100px ancho / 80px alto) */
-        .plaza-caja { 
-            width: 100px; 
-            height: 80px;  
-            margin: 8px; 
-            padding: 10px; 
-            border-radius: 6px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            color: white; 
-            transition: background-color 0.3s; 
-            position: relative; 
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            background-color: #1a1a1a; 
+            color: white;
+            margin: 0;
+            padding: 20px;
         }
-        
-        /* Colores */
-        .libre { background-color: #4CAF50; /* Verde */ }
-        .ocupada { background-color: #F44336; /* Rojo */ }
-        .error { background-color: #FFC107; /* Amarillo/Naranja, si no hay conexión */ }
-        
-        /* Estilo para el separador visual entre grupos */
-        .plaza-caja:nth-child(2n+1) { border-left: 2px solid #555; } 
 
-        /* Letras más pequeñas para los cuadros reducidos */
-        .adaptada-etiqueta { font-size: 0.7em; font-weight: bold; background-color: #008CBA; padding: 1px 4px; border-radius: 3px; margin-top: 2px; }
-        .nombre-grupo { font-size: 0.8em; position: absolute; top: 2px; left: 5px; opacity: 0.7; }
-        .nombre-plaza { font-size: 1.0em; font-weight: bold; }
-        .estado-plaza { font-size: 1.2em; margin-top: 3px; }
+        .map-container {
+            position: relative;
+            display: inline-block;
+            margin: 20px auto;
+            border: 4px solid #3498db;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+            background-color: white;
+            line-height: 0;
+        }
+
+        .map-image {
+            display: block;
+            max-width: 95vw;
+            max-height: 70vh;
+            border-radius: 8px;
+        }
+
+        /* Estilo general de las plazas */
+        .plaza {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border: 2px solid white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 32px;
+            text-align: center;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Clase especial para plazas adaptadas */
+        .adaptada {
+            border: 2px solid #0056b3;
+            border-radius: 50%; /* Las hacemos circulares para que destaquen */
+        }
+
+        .plaza:hover { transform: scale(1.3); z-index: 100; }
+
+        /* Estados de color */
+        .libre { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
+        .ocupado { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
+        .error { background-color: #f1c40f; box-shadow: 0 0 15px #f1c40f; }
+        /* Si la adaptada está libre, usamos un azul brillante */
+        .adaptada.libre { background-color: #3498db; box-shadow: 0 0 15px #3498db; }
+
+        #info-panel {
+            max-width: 450px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            color: #333;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: none;
+            border-top: 5px solid #0056b3;
+        }
     </style>
 </head>
 <body>
 
-    <div class="contenedor-principal">
-        <h1>Estado del Parking (3 Grupos)</h1>
-        
-        <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" alt="Logo del Parking" style="width:80%; max-width: 600px; margin-bottom: 25px; height: auto;">
-        
-        <p class="estado-global" id="estado-texto">Conectando con Arduino...</p>
+    <h1>Sistema de Parking Inteligente ♿</h1>
+    <p>Las plazas circulares azules son <b>adaptadas para movilidad reducida</b>.</p>
 
-        <div class="panel-plazas" id="panel-plazas-contenedor">
-            {% for info in plazas_info %}
-            <div class="plaza-caja error" id="plaza-{{ loop.index }}">
-                <span class="nombre-grupo">{{ info.nombre_grupo }}</span>
-                
-                <span class="nombre-plaza">{{ info.nombre_plaza }}</span>
-                
-                {% if info.tipo %}
-                    <span class="adaptada-etiqueta">{{ info.tipo }}</span>
-                {% endif %}
-                
-                <span class="estado-plaza" id="estado-{{ loop.index }}">ERR</span>
-            </div>
-            {% endfor %}
-        </div>
+    <div class="map-container">
+        <img src="{{ url_for('static', filename='img/logo_parking.png') }}" class="map-image">
+
+        <div id="p2" class="plaza adaptada error" style="top: 15%; left: 85%;" onclick="mostrarInfo('Zona Norte', true)">♿</div>
+        <div id="p3" class="plaza error" style="top: 22%; left: 85%;" onclick="mostrarInfo('Zona Norte', false)">2</div>
+        
+        <div id="p4" class="plaza adaptada error" style="top: 70%; left: 85%;" onclick="mostrarInfo('Zona Sur', true)">♿</div>
+        <div id="p5" class="plaza error" style="top: 77%; left: 85%;" onclick="mostrarInfo('Zona Sur', false)">2</div>
+
+        <div id="p6" class="plaza adaptada error" style="top: 45%; left: 45%;" onclick="mostrarInfo('Zona Central', true)">♿</div>
+        <div id="p7" class="plaza error" style="top: 52%; left: 45%;" onclick="mostrarInfo('Zona Central', false)">2</div>
+    </div>
+
+    <div id="info-panel">
+        <h2 id="zona-nombre" style="margin-top:0;">Sector</h2>
+        <div id="zona-stats" style="font-size: 1.1em; line-height: 1.6;"></div>
+        <button onclick="document.getElementById('info-panel').style.display='none'" style="margin-top:15px; cursor:pointer; padding:8px 15px; background:#0056b3; color:white; border:none; border-radius:5px;">Entendido</button>
     </div>
 
     <script>
-        function actualizarEstado() {
-            // Llama a la API de Flask para obtener la lista de 6 estados
-            fetch('/api/estado')
-                .then(response => response.json())
-                .then(data => {
-                    const estados = data.estados; 
-                    const textoGlobal = document.getElementById('estado-texto');
-                    let plazas_libres = 0;
+        const CONFIG = {
+            "Zona Norte": 45,
+            "Zona Sur": 29,
+            "Zona Central": 198
+        };
 
-                    estados.forEach((estado, index) => {
-                        const plazaId = index + 1;
-                        const caja = document.getElementById(`plaza-${plazaId}`);
-                        const estadoTexto = document.getElementById(`estado-${plazaId}`);
+        function mostrarInfo(nombreZona, esAdaptada) {
+            let ocupadas = 0;
+            if (nombreZona === "Zona Norte") {
+                if(document.getElementById('p2').classList.contains('ocupado')) ocupadas++;
+                if(document.getElementById('p3').classList.contains('ocupado')) ocupadas++;
+            } else if (nombreZona === "Zona Sur") {
+                if(document.getElementById('p4').classList.contains('ocupado')) ocupadas++;
+                if(document.getElementById('p5').classList.contains('ocupado')) ocupadas++;
+            } else if (nombreZona === "Zona Central") {
+                if(document.getElementById('p6').classList.contains('ocupado')) ocupadas++;
+                if(document.getElementById('p7').classList.contains('ocupado')) ocupadas++;
+            }
 
-                        if (!caja) return; 
+            const disponibles = CONFIG[nombreZona] - ocupadas;
+            const panel = document.getElementById('info-panel');
+            panel.style.display = 'block';
+            
+            let avisoPMR = esAdaptada ? "<p style='color:#0056b3; font-weight:bold;'>⚠️ ESTA ES UNA PLAZA ADAPTADA (♿).<br>Uso exclusivo para personas con movilidad reducida.</p>" : "";
 
-                        caja.classList.remove('libre', 'ocupada', 'error');
-
-                        if (estado === 1) {
-                            // LIBRE (Verde)
-                            caja.classList.add('libre');
-                            estadoTexto.textContent = 'LIBRE';
-                            plazas_libres++;
-                        } else if (estado === 0) {
-                            // OCUPADO (Rojo)
-                            caja.classList.add('ocupada');
-                            estadoTexto.textContent = 'OCUPADO';
-                        } else if (estado === -1) {
-                            // ERROR/DESCONECTADO (Amarillo)
-                            caja.classList.add('error');
-                            estadoTexto.textContent = 'ERR';
-                        }
-                    });
-                    
-                    // Actualiza el texto global
-                    if (estados[0] === -1) {
-                        textoGlobal.textContent = 'Estado General: Sin conexión al Arduino (Verifique el puerto COM)';
-                    } else if (plazas_libres === 0) {
-                        textoGlobal.textContent = 'Estado General: Parking LLENO';
-                    } else {
-                         textoGlobal.textContent = `Estado General: ${plazas_libres} plazas LIBRES`;
-                    }
-                })
-                .catch(error => {
-                    const textoGlobal = document.getElementById('estado-texto');
-                    textoGlobal.textContent = 'ERROR: El servidor web está caído o no responde.';
-                });
+            document.getElementById('zona-nombre').innerText = nombreZona;
+            document.getElementById('zona-stats').innerHTML = 
+                avisoPMR +
+                `Capacidad total del sector: <b>${CONFIG[nombreZona]}</b><br>` +
+                `Disponibilidad actual: <b style="font-size:1.4em; color:#2ecc71">${disponibles}</b>`;
+            
+            panel.scrollIntoView({ behavior: 'smooth' });
         }
 
-        actualizarEstado();
-        setInterval(actualizarEstado, 500); // Actualiza cada 0.5 segundos
+        function actualizarDatos() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    for (let i = 2; i <= 7; i++) {
+                        let id = "p" + i;
+                        let element = document.getElementById(id);
+                        if (!element) continue;
+
+                        let estado = data[id]; 
+                        element.classList.remove('libre', 'ocupado', 'error');
+
+                        if (estado === 1) {
+                            element.classList.add('ocupado');
+                        } else if (estado === 0) {
+                            element.classList.add('libre');
+                        } else {
+                            element.classList.add('error');
+                        }
+                    }
+                })
+                .catch(err => console.error("Error:", err));
+        }
+
+        setInterval(actualizarDatos, 2000);
+        actualizarDatos();
     </script>
 </body>
 </html>
