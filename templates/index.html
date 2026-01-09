@@ -2,36 +2,85 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>MODO PRUEBA - Smart Parking Ociopia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking Ociopia - Móvil</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        .contenedor-principal { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .map-container { position: relative; background: #222; border-radius: 10px; padding: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .map-image { display: block; max-width: 100%; height: auto; max-height: 80vh; border-radius: 8px; opacity: 0.8; }
+        /* --- DISEÑO BASE --- */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #1a1a1a; 
+            color: white; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: row; /* Horizontal en PC */
+            height: 100vh; 
+        }
 
-        .zona-interactiva { position: absolute; cursor: pointer; transition: 0.3s; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .zona-interactiva:hover { background-color: rgba(255, 255, 255, 0.1); }
-        .nombre-zona { font-size: 11px; font-weight: bold; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-bottom: 5px; pointer-events: none; }
+        /* --- CONTENEDOR DEL MAPA --- */
+        .contenedor-principal { 
+            flex: 2; 
+            position: relative; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 10px; 
+            background: #111;
+        }
+        .map-container { 
+            position: relative; 
+            background: #222; 
+            border-radius: 10px; 
+            padding: 5px; 
+            width: 100%;
+            max-width: 600px;
+        }
+        .map-image { 
+            display: block; 
+            width: 100%; 
+            height: auto; 
+            border-radius: 8px; 
+            opacity: 0.8; 
+        }
 
-        .contenedor-leds { display: flex; gap: 8px; }
-        .led { width: 20px; height: 20px; border: 2px solid white; border-radius: 4px; }
+        /* --- ZONAS INTERACTIVAS --- */
+        .zona-interactiva { position: absolute; cursor: pointer; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .nombre-zona { font-size: 10px; font-weight: bold; background: rgba(0,0,0,0.8); padding: 2px 4px; border-radius: 3px; margin-bottom: 2px; }
+        .contenedor-leds { display: flex; gap: 5px; }
+        .led { width: 16px; height: 16px; border: 1.5px solid white; border-radius: 3px; }
         .led-adaptada { border-radius: 50%; border-color: #3498db; }
-        .led-off { background-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
-        .led-on { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
+        .led-off { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+        .led-on { background-color: #e74c3c; box-shadow: 0 0 10px #e74c3c; }
 
-        .side-panel { width: 380px; background: #252525; border-left: 3px solid #444; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        .stat-box { background: #333; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-top: 5px solid #666; }
-        .big-num { font-size: 2em; font-weight: bold; color: #2ecc71; }
-        #historial { height: 150px; overflow-y: auto; font-size: 0.75em; margin-top: 10px; border-top: 1px solid #444; padding-top: 5px; }
+        /* --- PANEL LATERAL (DERECHA EN PC, ABAJO EN MÓVIL) --- */
+        .side-panel { 
+            width: 380px; 
+            background: #252525; 
+            border-left: 3px solid #444; 
+            padding: 20px; 
+            box-sizing: border-box; 
+            overflow-y: auto; 
+        }
+        .stat-box { background: #333; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-top: 5px solid #666; }
+        .big-num { font-size: 2.2em; font-weight: bold; color: #2ecc71; }
+        #historial { height: 120px; overflow-y: auto; font-size: 0.8em; margin-top: 10px; border-top: 1px solid #444; padding-top: 5px; }
+
+        /* --- ADAPTACIÓN PARA MÓVIL --- */
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .side-panel { width: 100%; border-left: none; border-top: 3px solid #444; height: auto; padding: 15px; }
+            .contenedor-principal { height: 50vh; min-height: 350px; }
+            .big-num { font-size: 2.8em; } /* Números más grandes en móvil */
+            .nombre-zona { font-size: 9px; }
+        }
     </style>
 </head>
 <body onload="mostrarInfo('Zona Central')">
 
     <div class="contenedor-principal">
         <div class="map-container">
-            <img src="static/img/logo_parking.jpg" class="map-image" onerror="this.style.background='#333'; this.style.width='600px'; this.style.height='400px';">
+            <img src="static/img/logo_parking.jpg" class="map-image" onerror="this.style.background='#333'; this.parentElement.style.height='300px';">
 
-            <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:45%; height:90%; border:2px dashed #f39c12;" onclick="mostrarInfo('Zona Central')">
+            <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%; border:1.5px dashed #f39c12;" onclick="mostrarInfo('Zona Central')">
                 <span class="nombre-zona" style="color:#f39c12;">CENTRAL</span>
                 <div class="contenedor-leds">
                     <div id="led-p6" class="led led-adaptada"></div>
@@ -39,7 +88,7 @@
                 </div>
             </div>
 
-            <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%; border:2px dashed #3498db;" onclick="mostrarInfo('Zona Norte')">
+            <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%; border:1.5px dashed #3498db;" onclick="mostrarInfo('Zona Norte')">
                 <span class="nombre-zona" style="color:#3498db;">NORTE</span>
                 <div class="contenedor-leds">
                     <div id="led-p2" class="led led-adaptada"></div>
@@ -47,7 +96,7 @@
                 </div>
             </div>
 
-            <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%; border:2px dashed #e74c3c;" onclick="mostrarInfo('Zona Sur')">
+            <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%; border:1.5px dashed #e74c3c;" onclick="mostrarInfo('Zona Sur')">
                 <span class="nombre-zona" style="color:#e74c3c;">SUR</span>
                 <div class="contenedor-leds">
                     <div id="led-p4" class="led led-adaptada"></div>
@@ -59,33 +108,21 @@
 
     <div class="side-panel">
         <div id="status-general" class="stat-box">
-            <h2 id="msg-principal" style="margin:0; font-size: 1.2em;">MODO SIMULACIÓN</h2>
-            <p style="font-size: 0.7em; color: #aaa; margin: 5px 0 0 0;">(Simulando datos sin Arduino)</p>
+            <h2 id="msg-principal" style="margin:0; font-size: 1.3em;">CARGANDO...</h2>
         </div>
         
         <div id="detalle-zona"></div>
         <div id="aviso-zona"></div>
         
         <div class="stat-box" style="border-top-color: #9b59b6;">
-            <h3 style="margin:0; color:#9b59b6; font-size: 0.8em;">HISTORIAL EN VIVO</h3>
+            <h3 style="margin:0; color:#9b59b6; font-size: 0.9em;">HISTORIAL</h3>
             <div id="historial"></div>
         </div>
-
-        <p style="font-size: 0.7em; color: #666; text-align: center;">Haz clic en las zonas para ver sus datos</p>
     </div>
 
     <script>
-        // --- VARIABLES DE SIMULACIÓN ---
-        // Cambia estos 0 por 1 para ver cómo reacciona la web
-        let datosSimulados = { 
-            p2: 1, // Norte Adaptada (OCUPADA)
-            p3: 1, // Norte Normal (OCUPADA) -> Esto hará que Norte esté LLENA
-            p4: 0, // Sur Adaptada
-            p5: 1, // Sur Normal
-            p6: 0, // Central Adaptada
-            p7: 0  // Central Normal
-        };
-
+        // --- SIMULACIÓN (PARA QUE VEAS DATOS AHORA) ---
+        let datosSimulados = { p2: 1, p3: 1, p4: 0, p5: 0, p6: 0, p7: 0 };
         let ultimosEstados = { p2:0, p3:0, p4:0, p5:0, p6:0, p7:0 };
         let zonaActual = "Zona Central";
 
@@ -101,18 +138,17 @@
         }
 
         function actualizarInterfaz() {
-            const data = datosSimulados;
+            // Cuando tengas el Arduino, cambia esto por el fetch
+            const data = datosSimulados; 
             
             // 1. Historial
             for (let pin in data) {
                 if (data[pin] !== ultimosEstados[pin]) {
                     let accion = data[pin] === 1 ? "OCUPADA" : "LIBERADA";
                     let zonaNom = (pin === 'p2' || pin === 'p3') ? "Norte" : (pin === 'p4' || pin === 'p5') ? "Sur" : "Central";
-                    let tipo = (parseInt(pin.substring(1)) % 2 === 0) ? "♿ Adaptada" : "🚗 Estándar";
-                    
+                    let tipo = (parseInt(pin.substring(1)) % 2 === 0) ? "♿" : "🚗";
                     let log = document.createElement('div');
-                    log.style.marginBottom = "5px";
-                    log.innerHTML = `<span style="color:#777">${new Date().toLocaleTimeString()}</span> - <b>${zonaNom}</b>: ${tipo} ${accion}`;
+                    log.innerHTML = `<span style="color:#777">${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</span> ${tipo} <b>${zonaNom}</b> ${accion}`;
                     document.getElementById('historial').prepend(log);
                     ultimosEstados[pin] = data[pin];
                 }
@@ -120,7 +156,7 @@
 
             // 2. Estado General
             let ocupadas = Object.values(data).reduce((a, b) => a + b, 0);
-            document.getElementById('msg-principal').innerText = (ocupadas === 6) ? "🚨 PARKING LLENO" : "✅ PLAZAS DISPONIBLES";
+            document.getElementById('msg-principal').innerText = (ocupadas === 6) ? "🚨 LLENO" : "✅ DISPONIBLE";
             document.getElementById('status-general').style.borderColor = (ocupadas === 6) ? "#e74c3c" : "#2ecc71";
 
             // 3. Luces
@@ -132,15 +168,15 @@
                 }
             }
 
-            // 4. Panel de Detalles
+            // 4. Panel
             const n = zonaActual;
-            const pA = data[CONFIG[n].pines[0]];
-            const pB = data[CONFIG[n].pines[1]];
             document.getElementById('detalle-zona').innerHTML = `
                 <div class="stat-box" style="border-color: ${CONFIG[n].color}">
                     <h3 style="margin:0; color:${CONFIG[n].color}">${n}</h3>
-                    <p style="margin:10px 0 0; font-size:0.8em;">NORMALES: <b class="big-num">${CONFIG[n].totales - pB}</b></p>
-                    <p style="margin:5px 0 0; font-size:0.8em;">ADAPTADAS: <b class="big-num" style="color:#3498db">${CONFIG[n].adaptadas - pA}</b></p>
+                    <div style="display:flex; justify-content:space-around; align-items:center; margin-top:10px;">
+                        <div><small>ESTÁNDAR</small><br><span class="big-num">${CONFIG[n].totales - data[CONFIG[n].pines[1]]}</span></div>
+                        <div><small>ADAPTADA</small><br><span class="big-num" style="color:#3498db">${CONFIG[n].adaptadas - data[CONFIG[n].pines[0]]}</span></div>
+                    </div>
                 </div>`;
 
             // 5. Recomendación
@@ -150,7 +186,6 @@
         function gestionarRecomendacion(data) {
             let aviso = document.getElementById('aviso-zona');
             let pA = CONFIG[zonaActual].pines[0], pB = CONFIG[zonaActual].pines[1];
-            
             if (data[pA] === 1 && data[pB] === 1) {
                 let mejorZona = "", maxLibres = -1;
                 for (let z in CONFIG) {
@@ -158,20 +193,11 @@
                     let libres = (1 - data[CONFIG[z].pines[0]]) + (1 - data[CONFIG[z].pines[1]]);
                     if (libres > maxLibres) { maxLibres = libres; mejorZona = z; }
                 }
-                aviso.innerHTML = `
-                    <div style="background:#422; border:2px solid #e74c3c; padding:15px; border-radius:10px;">
-                        <b style="color:#e74c3c;">⚠️ ZONA AGOTADA</b><br>
-                        <small>Se recomienda ir a:</small><br>
-                        <b style="color:#2ecc71; font-size:1.2em;">📍 ${mejorZona.toUpperCase()}</b>
-                    </div>`;
-            } else {
-                aviso.innerHTML = "";
-            }
+                aviso.innerHTML = `<div class="stat-box" style="border-color:#e74c3c; background:#422; text-align:center;"><b style="color:#e74c3c;">⚠️ ZONA AGOTADA</b><br><small>Mejor ir a:</small> <b style="color:#2ecc71;">📍 ${mejorZona.toUpperCase()}</b></div>`;
+            } else { aviso.innerHTML = ""; }
         }
 
-        // Ejecutar actualización al cargar
         actualizarInterfaz();
-        // Simular que el sistema "revisa" cada 2 segundos
         setInterval(actualizarInterfaz, 2000);
     </script>
 </body>
