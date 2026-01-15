@@ -5,222 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Parking Ociopia | Control Panel</title>
     <style>
-        /* --- ESTILOS GENERALES --- */
         :root {
-            --norte: #3498db;
-            --sur: #e74c3c;
-            --central: #f39c12;
-            --bg-dark: #121212;
-            --panel-bg: #1e1e1e;
+            --norte: #3498db; --sur: #e74c3c; --central: #f39c12;
+            --bg-dark: #121212; --panel-bg: #1e1e1e;
         }
 
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--bg-dark); 
-            color: white; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: row; 
-            height: 100vh; 
-            overflow: hidden; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background-color: var(--bg-dark); color: white; margin: 0; 
+            display: flex; height: 100vh; overflow: hidden; 
         }
 
-        /* --- CONTENEDOR DEL MAPA --- */
+        /* --- CONTENEDOR MAPA --- */
         .contenedor-principal { 
-            flex: 3; 
-            position: relative; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 20px; 
-            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+            flex: 3; position: relative; display: flex; 
+            justify-content: center; align-items: center; 
+            padding: 20px; background: #111; 
         }
         
         .map-container { 
-            position: relative; 
-            background: #222; 
-            border-radius: 20px; 
-            padding: 15px; 
-            width: 100%;
-            max-width: 1100px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            border: 1px solid #333;
+            position: relative; background: #222; border-radius: 20px; 
+            padding: 10px; width: 100%; max-width: 1100px; 
+            box-shadow: 0 0 40px rgba(0,0,0,0.8); border: 1px solid #333; 
         }
 
-        .map-image { 
-            display: block; 
-            width: 100%; 
-            height: auto; 
-            border-radius: 12px; 
-            opacity: 0.8; 
-            filter: grayscale(0.3);
-        }
+        .map-image { width: 100%; border-radius: 12px; opacity: 0.6; display: block; }
 
         /* --- ZONAS INTERACTIVAS --- */
         .zona-interactiva { 
-            position: absolute; 
-            cursor: pointer; 
-            border-radius: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid rgba(255,255,255,0.05);
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(2px);
-            overflow: hidden; /* Importante para el escáner */
+            position: absolute; cursor: pointer; border-radius: 15px; 
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; transition: 0.4s; 
+            border: 2px solid rgba(255,255,255,0.05); overflow: hidden;
         }
 
-        .zona-interactiva:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-5px);
-            z-index: 10;
-        }
+        .zona-activa.norte { border-color: var(--norte); background: rgba(52,152,219,0.15); }
+        .zona-activa.central { border-color: var(--central); background: rgba(243,156,18,0.15); }
+        .zona-activa.sur { border-color: var(--sur); background: rgba(231,76,60,0.15); }
 
-        .zona-activa.norte { border-color: var(--norte); box-shadow: 0 0 20px rgba(52,152,219,0.3); background: rgba(52,152,219,0.1); }
-        .zona-activa.central { border-color: var(--central); box-shadow: 0 0 20px rgba(243,156,18,0.3); background: rgba(243,156,18,0.1); }
-        .zona-activa.sur { border-color: var(--sur); box-shadow: 0 0 20px rgba(231,76,60,0.3); background: rgba(231,76,60,0.1); }
-        
         .nombre-zona { 
-            font-size: 1.2vw; 
-            font-weight: 800; 
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: rgba(0,0,0,0.6); 
-            padding: 4px 12px; 
-            border-radius: 8px; 
-            margin-bottom: 10px; 
-            z-index: 2; /* Para que esté por encima del escáner */
+            font-weight: 800; font-size: 1.2vw; z-index: 2; 
+            text-transform: uppercase; letter-spacing: 1px; 
         }
 
         /* --- ESCÁNER LÁSER --- */
-        .scanner-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px; /* Altura de la línea */
-            background: linear-gradient(to right, transparent, var(--norte), transparent); /* Color del escáner */
-            animation: scan 2s infinite linear;
-            z-index: 1;
-            opacity: 0;
+        .scanner { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px; 
+            background: rgba(255,255,255,0.5); opacity: 0; z-index: 1; 
         }
-        .zona-activa .scanner-line {
-            opacity: 1;
-        }
-
-        /* Colores específicos para el escáner */
-        .zona-activa.norte .scanner-line { background: linear-gradient(to right, transparent, var(--norte), transparent); }
-        .zona-activa.central .scanner-line { background: linear-gradient(to right, transparent, var(--central), transparent); }
-        .zona-activa.sur .scanner-line { background: linear-gradient(to right, transparent, var(--sur), transparent); }
-
-
-        @keyframes scan {
-            0% { transform: translateY(0%); }
-            100% { transform: translateY(calc(100% - 5px)); }
-        }
-
-
-        /* --- LEDS NEÓN --- */
-        .contenedor-leds { display: flex; gap: 12px; z-index: 2; } /* Z-index para que se vea */
-        .led { 
-            width: 1.8vw; height: 1.8vw; min-width: 18px; min-height: 18px; 
-            border-radius: 6px; 
-            transition: all 0.5s ease;
-        }
-        .led-adaptada { border-radius: 50%; }
+        .zona-activa .scanner { opacity: 1; animation: scan 3s infinite linear; }
         
-        .led-off { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
-        .led-on { background-color: #e74c3c; box-shadow: 0 0 20px #e74c3c; animation: pulse 2s infinite; }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
+        @keyframes scan { 
+            0% { top: 0; } 
+            100% { top: 100%; } 
         }
+
+        /* --- LEDS (PLAZAS) --- */
+        .contenedor-leds { display: flex; gap: 12px; z-index: 2; margin-top: 10px; }
+        .led { 
+            width: 2.2vw; height: 2.2vw; min-width: 22px; min-height: 22px; 
+            border-radius: 8px; transition: 0.4s; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 0.9vw; font-weight: bold;
+        }
+        .led-off { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: #000; }
+        .led-on { background: #e74c3c; box-shadow: 0 0 15px #e74c3c; color: #fff; }
 
         /* --- PANEL LATERAL --- */
         .side-panel { 
-            width: 400px; 
-            background: var(--panel-bg); 
-            border-left: 1px solid #333; 
-            padding: 30px; 
-            box-sizing: border-box; 
+            width: 400px; background: var(--panel-bg); padding: 30px; 
+            border-left: 1px solid #333; display: flex; flex-direction: column; 
         }
 
         .stat-box { 
-            background: #2a2a2a; 
-            padding: 20px; 
-            border-radius: 18px; 
-            border-left: 5px solid #444; 
-            margin-bottom: 20px;
+            background: #2a2a2a; padding: 25px; border-radius: 20px; 
+            margin-bottom: 20px; border-top: 5px solid #444; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
         }
 
-        .big-num { font-size: 3em; font-weight: 800; }
-        
-        #historial { height: 200px; overflow-y: auto; font-size: 0.9em; }
+        .big-num { font-size: 4em; font-weight: bold; line-height: 1; margin: 5px 0; }
+        .label-plaza { color: #888; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- ANILLO DE OCUPACIÓN --- */
-        .donut-chart-container {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: conic-gradient(#2ecc71 0% 0%, #3a3a3a 0% 100%); /* Inicialmente vacío */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            margin: 0 auto 10px auto;
-            transition: background 1s ease-out; /* Animación del relleno */
-        }
-        .donut-chart-container::before {
-            content: '';
-            position: absolute;
-            background: #2a2a2a; /* Color del centro */
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-        }
-        .donut-percentage {
-            position: relative;
-            z-index: 1;
-            font-size: 1.5em;
-            font-weight: bold;
-            color: white;
-        }
+        #historial { flex-grow: 1; overflow-y: auto; font-size: 0.85em; padding-right: 5px; }
+        #historial::-webkit-scrollbar { width: 5px; }
+        #historial::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
 
-        /* BOTÓN SIMULADOR */
-        .btn-simulador {
-            position: fixed;
-            bottom: 20px;
-            right: 420px;
-            padding: 12px 20px;
-            background: #9b59b6;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);
-            z-index: 100;
-            transition: 0.3s;
-        }
-        .btn-simulador:hover { transform: scale(1.1); background: #8e44ad; }
-
-        /* Animación Shake para el aviso */
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(5px); }
-            50% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-            100% { transform: translateX(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body onload="mostrarInfo('Zona Central')">
-
-    <button class="btn-simulador" onclick="alternarSimulacion()">🧪 Probar Simulación</button>
 
     <div class="contenedor-principal">
         <div class="map-container">
@@ -229,42 +102,40 @@
             <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%;" onclick="mostrarInfo('Zona Central')">
                 <span class="nombre-zona" style="color:var(--central);">Central</span>
                 <div class="contenedor-leds">
-                    <div id="led-p6" class="led led-adaptada"></div>
-                    <div id="led-p7" class="led"></div>
+                    <div id="led-p6" class="led">♿</div>
+                    <div id="led-p7" class="led">🚗</div>
                 </div>
-                <div class="scanner-line"></div>
+                <div class="scanner"></div>
             </div>
 
             <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
                 <span class="nombre-zona" style="color:var(--norte);">Norte</span>
                 <div class="contenedor-leds">
-                    <div id="led-p2" class="led led-adaptada"></div>
-                    <div id="led-p3" class="led"></div>
+                    <div id="led-p2" class="led">♿</div>
+                    <div id="led-p3" class="led">🚗</div>
                 </div>
-                <div class="scanner-line"></div>
+                <div class="scanner"></div>
             </div>
 
             <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
                 <span class="nombre-zona" style="color:var(--sur);">Sur</span>
                 <div class="contenedor-leds">
-                    <div id="led-p4" class="led led-adaptada"></div>
-                    <div id="led-p5" class="led"></div>
+                    <div id="led-p4" class="led">♿</div>
+                    <div id="led-p5" class="led">🚗</div>
                 </div>
-                <div class="scanner-line"></div>
+                <div class="scanner"></div>
             </div>
         </div>
     </div>
 
     <div class="side-panel">
-        <div id="status-general" class="stat-box" style="text-align: center; border-left-width: 0; border-top: 5px solid #2ecc71;">
-            <h2 id="msg-principal" style="margin:0;">SISTEMA ACTIVO</h2>
-        </div>
+        <h2 style="margin: 0 0 20px 0; font-size: 1.8em;">Ociopia <span style="font-weight: 300; color: #666;">Parking</span></h2>
         
         <div id="detalle-zona"></div>
         <div id="aviso-zona"></div>
-        
-        <div class="stat-box" style="border-left-color: #9b59b6;">
-            <h3 style="margin:0 0 10px 0; color:#9b59b6;">HISTORIAL</h3>
+
+        <div class="stat-box" style="border-top-color: #555; flex-grow: 1;">
+            <h4 style="margin:0 0 15px 0; color:#888; text-transform: uppercase; font-size: 0.75em;">Historial de Plazas</h4>
             <div id="historial"></div>
         </div>
     </div>
@@ -273,186 +144,100 @@
         let ultimosEstados = { p2:0, p3:0, p4:0, p5:0, p6:0, p7:0 };
         let estadosPines = { p2:0, p3:0, p4:0, p5:0, p6:0, p7:0 };
         let zonaActual = "Zona Central";
-        let modoSimulacion = false;
 
         const CONFIG = {
-            "Zona Norte":   { id: 'zona-norte', totales: 41,  adaptadas: 4, pines: ['p2', 'p3'], color: "var(--norte)" },
-            "Zona Sur":     { id: 'zona-sur', totales: 27,  adaptadas: 2, pines: ['p4', 'p5'], color: "var(--sur)" },
-            "Zona Central": { id: 'zona-central', totales: 189, adaptadas: 9, pines: ['p6', 'p7'], color: "var(--central)" }
+            "Zona Norte":   { id: 'zona-norte', pines: ['p2', 'p3'], color: "#3498db" },
+            "Zona Sur":     { id: 'zona-sur', pines: ['p4', 'p5'], color: "#e74c3c" },
+            "Zona Central": { id: 'zona-central', pines: ['p6', 'p7'], color: "#f39c12" }
         };
-
-        function alternarSimulacion() {
-            modoSimulacion = !modoSimulacion;
-            const btn = document.querySelector('.btn-simulador');
-            btn.innerText = modoSimulacion ? "🛑 Detener Prueba" : "🧪 Probar Simulación";
-            btn.style.background = modoSimulacion ? "#e74c3c" : "#9b59b6";
-            if(modoSimulacion) simular();
-        }
-
-        function simular() {
-            if(!modoSimulacion) return;
-            
-            let mockData = {
-                p2: Math.round(Math.random()), p3: Math.round(Math.random()),
-                p4: Math.round(Math.random()), p5: Math.round(Math.random()),
-                p6: Math.round(Math.random()), p7: Math.round(Math.random())
-            };
-            
-            // Opcional: para forzar que la zona actual esté llena en la simulación
-            // mockData[CONFIG[zonaActual].pines[0]] = 1;
-            // mockData[CONFIG[zonaActual].pines[1]] = 1;
-
-            actualizarInterfazVisual(mockData);
-            setTimeout(simular, 2000); 
-        }
 
         function mostrarInfo(nombre) {
             zonaActual = nombre;
-            
-            // Quitar clase activa y scanner de todas
-            document.querySelectorAll('.zona-interactiva').forEach(z => {
-                z.classList.remove('zona-activa', 'norte', 'central', 'sur');
-                z.querySelector('.scanner-line').style.opacity = 0; // Oculta el escáner
-            });
-            
-            // Añadir clase activa y scanner a la seleccionada
-            const zCfg = CONFIG[nombre];
-            const el = document.getElementById(zCfg.id);
-            el.classList.add('zona-activa');
-            if(nombre.includes("Norte")) el.classList.add('norte');
-            if(nombre.includes("Central")) el.classList.add('central');
-            if(nombre.includes("Sur")) el.classList.add('sur');
-            el.querySelector('.scanner-line').style.opacity = 1; // Muestra el escáner
-
-            actualizarInterfazVisual(estadosPines); // Actualiza el panel con los datos actuales
-        }
-
-        function actualizar() {
-            if(modoSimulacion) return;
-            fetch('/status')
-                .then(res => res.json())
-                .then(data => actualizarInterfazVisual(data))
-                .catch(err => console.error("Error al recibir datos:", err));
+            document.querySelectorAll('.zona-interactiva').forEach(z => z.classList.remove('zona-activa'));
+            document.getElementById(CONFIG[nombre].id).classList.add('zona-activa');
+            actualizarInterfazVisual(estadosPines);
         }
 
         function actualizarInterfazVisual(data) {
-            estadosPines = data; // Aseguramos que los datos globales se actualizan
-
-            // 1. Historial
+            estadosPines = data;
+            
+            // 1. Actualizar LEDs y registrar cambios
             for (let pin in data) {
-                if (data[pin] !== ultimosEstados[pin]) {
-                    let accion = data[pin] === 1 ? '<span style="color:#e74c3c">OCUPADA</span>' : '<span style="color:#2ecc71">LIBERADA</span>';
-                    let zonaNom = (pin === 'p2' || pin === 'p3') ? "Norte" : (pin === 'p4' || pin === 'p5') ? "Sur" : "Central";
-                    let tipo = (parseInt(pin.substring(1)) % 2 === 0) ? "♿" : "🚗";
-                    
-                    let log = document.createElement('div');
-                    log.style.padding = "8px 0";
-                    log.style.borderBottom = "1px solid #333";
-                    log.style.animation = "fadeIn 0.5s ease";
-                    log.innerHTML = `<small style="color:#666">${new Date().toLocaleTimeString()}</small> ${tipo} <b>${zonaNom}</b> ${accion}`;
-                    
-                    document.getElementById('historial').prepend(log);
-                    ultimosEstados[pin] = data[pin];
-                }
-            }
-
-            // 2. Estado General
-            let ocupadasGlobales = Object.values(data).reduce((a, b) => a + b, 0);
-            const msgP = document.getElementById('msg-principal');
-            const cajaP = document.getElementById('status-general');
-            
-            if (ocupadasGlobales === 6) { // Si todos los pines están ocupados
-                msgP.innerText = "🚨 PARKING LLENO";
-                cajaP.style.borderTopColor = "#e74c3c";
-            } else {
-                msgP.innerText = "✅ DISPONIBLE";
-                cajaP.style.borderTopColor = "#2ecc71";
-            }
-
-            // 3. LEDs Neón
-            for (let i = 2; i <= 7; i++) {
-                let led = document.getElementById('led-p' + i);
+                let led = document.getElementById('led-' + pin);
                 if (led) {
-                    led.className = data['p' + i] === 1 ? 'led led-on' : 'led led-off';
-                    if (i % 2 === 0) led.classList.add('led-adaptada');
+                    led.className = data[pin] === 1 ? 'led led-on' : 'led led-off';
+                    
+                    if (data[pin] !== ultimosEstados[pin]) {
+                        agregarLog(pin, data[pin]);
+                        ultimosEstados[pin] = data[pin];
+                    }
                 }
             }
 
-            // 4. Panel Detalle (con Anillo de Ocupación)
-            const z = zonaActual;
-            const c = CONFIG[z];
-            
-            // Calcular ocupación de la zona actual
-            let ocupadasZona = (data[c.pines[0]] === 1 ? 1 : 0) + (data[c.pines[1]] === 1 ? 1 : 0);
-            let totalPinesZona = 2; // Siempre 2 pines por zona
-            let porcentajeOcupacion = (ocupadasZona / totalPinesZona) * 100;
-            
+            // 2. Panel Detalle (1 normal, 1 adaptada)
+            const c = CONFIG[zonaActual];
+            const adaptadaLibre = data[c.pines[0]] === 0 ? 1 : 0;
+            const normalLibre = data[c.pines[1]] === 0 ? 1 : 0;
+
             document.getElementById('detalle-zona').innerHTML = `
-                <div class="stat-box" style="border-left-color: ${c.color}">
-                    <h3 style="margin:0; color:${c.color}; font-size:0.8em; text-transform:uppercase;">Detalle ${z}</h3>
-                    <div style="display:flex; justify-content:space-around; align-items:center; margin-top:15px;">
-                        <div class="donut-chart-container" style="background: conic-gradient(#e74c3c 0% ${porcentajeOcupacion}%, #3a3a3a ${porcentajeOcupacion}% 100%);">
-                            <span class="donut-percentage">${Math.round(porcentajeOcupacion)}%</span>
+                <div class="stat-box" style="border-top-color: ${c.color}">
+                    <div style="display:flex; justify-content: space-between; text-align:center;">
+                        <div>
+                            <span class="label-plaza">Normal</span><br>
+                            <span class="big-num">${normalLibre}</span><br>
+                            <small style="color:${normalLibre > 0 ? '#2ecc71':'#e74c3c'}">${normalLibre > 0 ? 'LIBRE':'OCUPADA'}</small>
                         </div>
-                        <div style="text-align:center;">
-                            <small style="color:#888">ESTÁNDAR</small><br>
-                            <span class="big-num" style="color:white">${c.totales - (data[c.pines[1]] === 1 ? 1 : 0)}</span>
-                        </div>
-                        <div style="text-align:center;">
-                            <small style="color:#888">ADAPTADA</small><br>
-                            <span class="big-num" style="color:#3498db">${c.adaptadas - (data[c.pines[0]] === 1 ? 1 : 0)}</span>
+                        <div style="border-left: 1px solid #444; padding-left:20px;">
+                            <span class="label-plaza">Adaptada</span><br>
+                            <span class="big-num" style="color:#3498db">${adaptadaLibre}</span><br>
+                            <small style="color:${adaptadaLibre > 0 ? '#2ecc71':'#e74c3c'}">${adaptadaLibre > 0 ? 'LIBRE':'OCUPADA'}</small>
                         </div>
                     </div>
                 </div>`;
-            
+
             gestionarRecomendacion(data);
         }
 
-        // --- FUNCIÓN DE RECOMENDACIÓN FINAL ---
-        function gestionarRecomendacion(data) {
-            let aviso = document.getElementById('aviso-zona');
-            let pA = CONFIG[zonaActual].pines[0];
-            let pB = CONFIG[zonaActual].pines[1];
+        function agregarLog(pin, estado) {
+            let pinNum = parseInt(pin.substring(1));
+            let zona = (pinNum < 4) ? "Norte" : (pinNum < 6) ? "Sur" : "Central";
+            let tipo = (pinNum % 2 === 0) ? "♿" : "🚗";
+            let msg = estado === 1 ? "OCUPADA" : "LIBRE";
+            let color = estado === 1 ? "#e74c3c" : "#2ecc71";
             
-            if (data[pA] === 1 && data[pB] === 1) { // Si los dos pines de la zona seleccionada están Ocupados
-                let mejorZona = "";
-                let maxLibres = -1;
-
-                for (let z in CONFIG) {
-                    if (z === zonaActual) continue;
-                    let libres = (data[CONFIG[z].pines[0]] === 0 ? 1 : 0) + (data[CONFIG[z].pines[1]] === 0 ? 1 : 0);
-                    
-                    if (libres > maxLibres) {
-                        maxLibres = libres;
-                        mejorZona = z;
-                    }
-                }
-                // Solo mostramos la recomendación si hay alguna zona con plazas libres
-                if (maxLibres > 0) {
-                     aviso.innerHTML = `
-                        <div class="stat-box" style="border-left: 5px solid #e74c3c; background: rgba(231, 76, 60, 0.2); animation: shake 0.5s ease; margin-top:15px;">
-                            <b style="color: #e74c3c; font-size: 1.1em;">⚠️ ${zonaActual.toUpperCase()} LLENA</b><br>
-                            <small style="color: #ccc;">No hay plazas disponibles en esta sección.</small>
-                            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">
-                                <span style="color: #2ecc71; font-weight: bold;">RECOMENDACIÓN:</span><br>
-                                <b style="color: white; font-size: 1.2em;">📍 Ir a ${mejorZona.toUpperCase()}</b>
-                            </div>
-                        </div>`;
-                } else {
-                    // Si todas las zonas están llenas, el aviso es diferente
-                     aviso.innerHTML = `
-                        <div class="stat-box" style="border-left: 5px solid #e74c3c; background: rgba(231, 76, 60, 0.2); animation: shake 0.5s ease; margin-top:15px;">
-                            <b style="color: #e74c3c; font-size: 1.1em;">🚨 PARKING COMPLETO</b><br>
-                            <small style="color: #ccc;">Todas las zonas están actualmente sin disponibilidad.</small>
-                        </div>`;
-                }
-            } else {
-                aviso.innerHTML = ""; 
-            }
+            const item = document.createElement('div');
+            item.style.padding = "5px 0";
+            item.style.borderBottom = "1px solid #333";
+            item.style.animation = "fadeIn 0.3s ease";
+            item.innerHTML = `<small style="color:#666">${new Date().toLocaleTimeString()}</small> | ${tipo} ${zona}: <b style="color:${color}">${msg}</b>`;
+            document.getElementById('historial').prepend(item);
         }
 
-        setInterval(actualizar, 2000); // Esto sigue llamando al servidor real
-        mostrarInfo('Zona Central'); // Para que al cargar, una zona ya esté activa
+        function gestionarRecomendacion(data) {
+            let aviso = document.getElementById('aviso-zona');
+            let pA = CONFIG[zonaActual].pines[0], pB = CONFIG[zonaActual].pines[1];
+            
+            if (data[pA] === 1 && data[pB] === 1) {
+                let mejor = ""; let max = -1;
+                for (let z in CONFIG) {
+                    if (z === zonaActual) continue;
+                    let libres = (data[CONFIG[z].pines[0]] === 0 ? 1:0) + (data[CONFIG[z].pines[1]] === 0 ? 1:0);
+                    if (libres > max) { max = libres; mejor = z; }
+                }
+                aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1);">
+                    <b style="color:#e74c3c">⚠️ ${zonaActual.toUpperCase()} COMPLETA</b><br>
+                    <small>Se recomienda dirigirse a la <b>${mejor}</b></small></div>`;
+            } else { aviso.innerHTML = ""; }
+        }
+
+        function refrescar() {
+            fetch('/status')
+                .then(r => r.json())
+                .then(d => actualizarInterfazVisual(d))
+                .catch(e => console.error("Error de conexión"));
+        }
+
+        setInterval(refrescar, 2000);
     </script>
 </body>
 </html>
