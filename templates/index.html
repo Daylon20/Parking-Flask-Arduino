@@ -6,7 +6,7 @@
     <title>Smart Parking</title>
     <style>
         :root {
-            --norte: #3498db; --sur: #9b59b6; --central: #f39c12; /* Sur cambiado a Violeta */
+            --norte: #3498db; --sur: #9b59b6; --central: #f39c12;
             --bg-dark: #121212; --panel-bg: #1e1e1e;
         }
 
@@ -28,10 +28,11 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid #333; margin: auto;
         }
 
-        .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.4; display: block; margin: 0 auto; }
+        .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.35; display: block; margin: 0 auto; }
 
+        /* Estilo de los LEDs en el mapa */
         .led { 
-            width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; 
+            width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; 
             justify-content: center; font-weight: bold; font-size: 20px; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
         }
         .led-off { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: #000; }
@@ -42,24 +43,42 @@
             .contenedor-principal { padding: 10px 0 !important; width: 100vw; }
             .side-panel { width: 100% !important; height: auto !important; border-left: none !important; }
             .map-container { width: 95%; }
+            .nombre-zona-mapa { font-size: 12px !important; }
         }
 
+        /* --- ZONAS INTERACTIVAS SOBRE LA IMAGEN --- */
         .zona-interactiva { 
             position: absolute; cursor: pointer; border-radius: 15px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            transition: 0.3s; border: 2px solid rgba(255,255,255,0.1);
+            transition: 0.3s; border: 3px solid; /* Borde más grueso */
         }
-        .zona-activa.norte { border-color: var(--norte); background: rgba(52,152,219,0.15); }
-        .zona-activa.central { border-color: var(--central); background: rgba(243,156,18,0.15); }
-        .zona-activa.sur { border-color: var(--sur); background: rgba(155,89,182,0.15); }
+        
+        /* Colores específicos para los bordes y fondos en la imagen */
+        #zona-norte { border-color: var(--norte); background: rgba(52,152,219,0.1); }
+        #zona-central { border-color: var(--central); background: rgba(243,156,18,0.1); }
+        #zona-sur { border-color: var(--sur); background: rgba(155,89,182,0.1); }
 
+        /* Efecto cuando la zona está seleccionada */
+        .zona-activa { box-shadow: inset 0 0 20px rgba(255,255,255,0.2); background: rgba(255,255,255,0.05) !important; border-width: 5px !important; }
+
+        .nombre-zona-mapa { 
+            font-weight: 800; /* Extra bold como en el panel */
+            font-size: 1.2vw; 
+            text-transform: uppercase; 
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9); /* Sombra para legibilidad */
+            letter-spacing: 1px;
+        }
+
+        /* --- PANEL LATERAL --- */
         .side-panel { 
             width: 400px; background: var(--panel-bg); padding: 25px; 
             border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh; overflow-y: auto;
         }
 
         .stat-box { background: #2a2a2a; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-top: 5px solid #444; }
-        .mini-box { background: #252525; padding: 12px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #444; }
+        .mini-box { background: #252525; padding: 12px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #444; cursor: pointer; transition: 0.2s; }
+        .mini-box:hover { background: #333; }
 
         .donut-chart { width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 10px auto; position: relative; }
         .donut-chart::after { content: ''; position: absolute; width: 70px; height: 70px; background: #2a2a2a; border-radius: 50%; }
@@ -75,17 +94,20 @@
     <div class="contenedor-principal">
         <div class="map-container">
             <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
+            
             <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%;" onclick="mostrarInfo('Zona Central')">
-                <span style="color:var(--central); font-weight:800;">CENTRAL</span>
-                <div style="display:flex; gap:8px; margin-top:5px;"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
+                <span class="nombre-zona-mapa" style="color:var(--central);">Parking Central</span>
+                <div style="display:flex; gap:10px;"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
             </div>
+
             <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
-                <span style="color:var(--norte); font-weight:800;">NORTE</span>
-                <div style="display:flex; gap:8px; margin-top:5px;"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
+                <span class="nombre-zona-mapa" style="color:var(--norte);">Parking Norte</span>
+                <div style="display:flex; gap:10px;"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
             </div>
+
             <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
-                <span style="color:var(--sur); font-weight:800;">SUR</span>
-                <div style="display:flex; gap:8px; margin-top:5px;"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
+                <span class="nombre-zona-mapa" style="color:var(--sur);">Parking Sur</span>
+                <div style="display:flex; gap:10px;"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
             </div>
         </div>
     </div>
@@ -105,7 +127,7 @@
         let zonaActual = "Zona Central";
         const CONFIG = {
             "Zona Norte":   { id: 'zona-norte', pines: ['p2', 'p3'], color: "#3498db" },
-            "Zona Sur":     { id: 'zona-sur', pines: ['p4', 'p5'], color: "#9b59b6" }, // Violeta
+            "Zona Sur":     { id: 'zona-sur', pines: ['p4', 'p5'], color: "#9b59b6" },
             "Zona Central": { id: 'zona-central', pines: ['p6', 'p7'], color: "#f39c12" }
         };
 
@@ -123,7 +145,6 @@
                 if (led) led.className = data[pin] === 1 ? 'led led-on' : 'led led-off';
             }
 
-            // 1. RENDER ZONA SELECCIONADA
             const c = CONFIG[zonaActual];
             const libA = data[c.pines[0]] === 0 ? 1 : 0;
             const libB = data[c.pines[1]] === 0 ? 1 : 0;
@@ -140,7 +161,6 @@
                     </div>
                 </div>`;
 
-            // 2. RENDER OTRAS ZONAS (MINI)
             let htmlOtras = "";
             for (let z in CONFIG) {
                 if (z === zonaActual) continue;
@@ -152,7 +172,7 @@
                         <span style="font-weight:bold;">${z}</span>
                         <div>
                             <span style="color:#2ecc71; font-size:1.2em;">${lA} ${lB}</span>
-                            ${lA==="" && lB==="" ? '<span style="color:#e74c3c; font-size:0.8em;">LLENO</span>' : ''}
+                            ${lA==="" && lB==="" ? '<span style="color:#e74c3c; font-size:0.8em; font-weight:bold;">COMPLETO</span>' : ''}
                         </div>
                     </div>`;
             }
@@ -176,8 +196,8 @@
                 }
                 if (maxL > 0) {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
-                        <b style="color:#e74c3c; font-size:0.9em;">⚠️ PARKING ${zonaActual.split(' ')[1].toUpperCase()} COMPLETO</b><br>
-                        <p style="margin:10px 0 0 0; font-size:0.9em;">Le sugerimos ir a la <b>${mejor}</b>:<br><br>${hRec}</p>
+                        <b style="color:#e74c3c; font-size:0.9em; text-transform:uppercase;">⚠️ PARKING ${zonaActual.split(' ')[1].toUpperCase()} COMPLETO</b><br>
+                        <p style="margin:10px 0 0 0; font-size:0.95em;">Le sugerimos ir a la <b>${mejor}</b>:<br><br>${hRec}</p>
                     </div>`;
                 } else {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold;">🚨 PARKING COMPLETO</div>`;
