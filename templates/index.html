@@ -25,32 +25,33 @@
         
         .map-container { 
             position: relative; background: #222; border-radius: 15px; 
-            padding: 10px; width: 100%; max-width: 1100px; 
+            padding: 10px; width: 100%; max-width: 1000px; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             border: 1px solid #333;
         }
 
         .map-image { width: 100%; border-radius: 10px; opacity: 0.4; display: block; }
 
-        /* --- ICONOS (LEDS) GRANDES --- */
-        .contenedor-leds { display: flex; gap: 15px; margin-top: 10px; }
+        /* --- ICONOS (LEDS) --- */
+        .contenedor-leds { display: flex; gap: 10px; margin-top: 5px; }
         .led { 
-            width: 50px; height: 50px; /* Tamaño grande para PC y Móvil */
-            border-radius: 12px; display: flex; align-items: center; 
-            justify-content: center; font-weight: bold; font-size: 26px; /* Icono grande */
+            width: 40px; height: 40px; 
+            border-radius: 10px; display: flex; align-items: center; 
+            justify-content: center; font-weight: bold; font-size: 20px;
             transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
         }
-        .led-off { background: #2ecc71; box-shadow: 0 0 20px #2ecc71; color: #000; }
-        .led-on { background: #e74c3c; box-shadow: 0 0 20px #e74c3c; color: #fff; }
+        .led-off { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: #000; }
+        .led-on { background: #e74c3c; box-shadow: 0 0 15px #e74c3c; color: #fff; }
 
-        /* --- RESPONSIVO MÓVIL --- */
+        /* --- RESPONSIVO MÓVIL (ICONOS REAJUSTADOS) --- */
         @media (max-width: 1000px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
             .contenedor-principal { padding: 10px !important; height: auto; order: 1; }
             .side-panel { width: 100% !important; border-left: none !important; padding: 25px !important; order: 2; height: auto !important; }
-            .map-container { max-width: 100%; }
-            .nombre-zona { font-size: 20px !important; }
-            .led { width: 60px; height: 60px; font-size: 32px; } /* Aún más grandes en móvil */
+            
+            /* Iconos un pelín más pequeños para que no tapen todo */
+            .led { width: 45px; height: 45px; font-size: 22px; } 
+            .nombre-zona { font-size: 16px !important; }
         }
 
         /* --- ZONAS EN EL MAPA --- */
@@ -58,42 +59,42 @@
             position: absolute; cursor: pointer; border-radius: 15px; 
             display: flex; flex-direction: column; align-items: center; 
             justify-content: center; transition: 0.3s; 
-            border: 3px solid rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.1);
         }
-        .zona-activa.norte { border-color: var(--norte); background: rgba(52,152,219,0.2); }
-        .zona-activa.central { border-color: var(--central); background: rgba(243,156,18,0.2); }
-        .zona-activa.sur { border-color: var(--sur); background: rgba(231,76,60,0.2); }
+        .zona-activa.norte { border-color: var(--norte); background: rgba(52,152,219,0.15); }
+        .zona-activa.central { border-color: var(--central); background: rgba(243,156,18,0.15); }
+        .zona-activa.sur { border-color: var(--sur); background: rgba(231,76,60,0.15); }
 
-        .nombre-zona { font-weight: 900; font-size: 1.4vw; text-transform: uppercase; letter-spacing: 1px; }
+        .nombre-zona { font-weight: 800; font-size: 1.1vw; text-transform: uppercase; }
 
         /* --- PANEL LATERAL --- */
         .side-panel { 
-            width: 400px; background: var(--panel-bg); padding: 35px; 
+            width: 380px; background: var(--panel-bg); padding: 30px; 
             border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh;
         }
 
         .stat-box { 
-            background: #2a2a2a; padding: 25px; border-radius: 20px; 
-            margin-bottom: 20px; border-top: 6px solid #444; 
+            background: #2a2a2a; padding: 20px; border-radius: 20px; 
+            margin-bottom: 20px; border-top: 5px solid #444; 
         }
 
         /* --- GRÁFICA --- */
         .donut-chart {
-            width: 110px; height: 110px; border-radius: 50%;
+            width: 100px; height: 100px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            margin: 20px auto; position: relative;
+            margin: 15px auto; position: relative;
         }
         .donut-chart::after {
-            content: ''; position: absolute; width: 85px; height: 85px;
+            content: ''; position: absolute; width: 75px; height: 75px;
             background: #2a2a2a; border-radius: 50%;
         }
-        .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.8em; }
+        .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.6em; }
 
-        .titulo-grafica { text-align: center; font-size: 0.9em; color: #888; text-transform: uppercase; letter-spacing: 2px; }
-        .nombre-zona-panel { text-align: center; font-size: 2em; font-weight: bold; margin-bottom: 10px; }
+        .titulo-grafica { text-align: center; font-size: 0.85em; color: #888; text-transform: uppercase; }
+        .nombre-zona-panel { text-align: center; font-size: 1.8em; font-weight: bold; margin-bottom: 5px; }
 
-        .big-num { font-size: 4.5em; font-weight: bold; margin: 0; line-height: 1; }
-        .label-plaza { color: #888; font-size: 0.9em; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; display: block; }
+        .big-num { font-size: 4em; font-weight: bold; margin: 0; line-height: 1; }
+        .label-plaza { color: #888; font-size: 0.8em; text-transform: uppercase; font-weight: bold; display: block; }
     </style>
 </head>
 <body onload="mostrarInfo('Zona Central')">
@@ -129,13 +130,10 @@
     </div>
 
     <div class="side-panel">
-        <h2 style="margin:0 0 35px 0; font-size: 2.2em; text-align: center;">Ociopia <span style="color:#666; font-weight:300;">Parking</span></h2>
-        
+        <h2 style="margin:0 0 25px 0; font-size: 2em; text-align: center;">Ociopia <span style="color:#666; font-weight:300;">Parking</span></h2>
         <div id="detalle-zona"></div>
         <div id="aviso-zona"></div>
-
         <div style="flex-grow: 1;"></div>
-        <p style="text-align: center; color: #555; font-size: 0.9em;">Panel de Control de Maqueta</p>
     </div>
 
     <script>
@@ -159,9 +157,7 @@
             estadosPines = data;
             for (let pin in data) {
                 let led = document.getElementById('led-' + pin);
-                if (led) {
-                    led.className = data[pin] === 1 ? 'led led-on' : 'led led-off';
-                }
+                if (led) { led.className = data[pin] === 1 ? 'led led-on' : 'led led-off'; }
             }
 
             const c = CONFIG[zonaActual];
@@ -177,14 +173,13 @@
                     <div class="donut-chart" style="background: conic-gradient(${c.color} ${porc}%, #444 0);">
                         <span class="donut-text">${porc}%</span>
                     </div>
-                    <div style="display:flex; justify-content: space-around; text-align:center; margin-top:25px;">
-                        <div><span class="label-plaza">Libres</span><br><span class="big-num">${normal}</span></div>
-                        <div style="border-left: 1px solid #333; padding-left: 20px;">
+                    <div style="display:flex; justify-content: space-around; text-align:center; margin-top:20px;">
+                        <div><span class="label-plaza">Libre</span><br><span class="big-num">${normal}</span></div>
+                        <div style="border-left: 1px solid #333; padding-left: 15px;">
                             <span class="label-plaza">Adaptada</span><br><span class="big-num" style="color:#3498db">${adaptada}</span>
                         </div>
                     </div>
                 </div>`;
-            
             gestionarRecomendacion(data);
         }
 
@@ -199,11 +194,11 @@
                 }
                 if (max > 0) {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
-                        <b style="color:#e74c3c; font-size:1.3em;">⚠️ ZONA LLENA</b><br>
-                        <p style="margin:10px 0 0 0;">Vaya a la:<br><b style="font-size:1.4em; color:white;">${mejor}</b></p>
+                        <b style="color:#e74c3c; font-size:1.2em;">⚠️ ZONA LLENA</b><br>
+                        <p style="margin:8px 0 0 0;">Le sugerimos ir a la:<br><b style="color:white;">${mejor}</b></p>
                     </div>`;
                 } else {
-                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold; font-size:1.2em;">🚨 PARKING COMPLETO</div>`;
+                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center;">🚨 PARKING COMPLETO</div>`;
                 }
             } else { aviso.innerHTML = ""; }
         }
