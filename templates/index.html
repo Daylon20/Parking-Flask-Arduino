@@ -3,17 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Parking</title>
+    <title>Smart Parking - Las Vegas</title>
     <style>
         :root {
             --norte: #3498db; --sur: #9b59b6; --central: #f39c12;
             --bg-dark: #121212; --panel-bg: #1e1e1e;
+            --vegas-neon: #ff00ff;
         }
 
         body { 
             font-family: 'Segoe UI', system-ui, sans-serif; 
             background-color: var(--bg-dark); color: white; margin: 0; 
             display: flex; flex-direction: row; height: 100vh; overflow: hidden;
+        }
+
+        /* TÍTULO PARKING LAS VEGAS */
+        .titulo-vegas {
+            position: absolute;
+            top: 20px;
+            z-index: 10;
+            color: var(--vegas-neon);
+            text-shadow: 0 0 5px #fff, 0 0 10px var(--vegas-neon), 0 0 20px var(--vegas-neon);
+            font-size: 2.2em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
         }
 
         .contenedor-principal { 
@@ -28,7 +45,7 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid #333; margin: auto;
         }
 
-        .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.35; display: block; margin: 0 auto; }
+        .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.6; display: block; margin: 0 auto; }
 
         .led { 
             width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; 
@@ -39,26 +56,35 @@
 
         @media (max-width: 1000px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
-            .contenedor-principal { padding: 10px 0 !important; width: 100vw; }
+            .contenedor-principal { padding: 80px 0 10px 0 !important; width: 100vw; }
             .side-panel { width: 100% !important; height: auto !important; border-left: none !important; }
             .map-container { width: 95%; }
             .nombre-zona-mapa { font-size: 12px !important; }
+            .titulo-vegas { font-size: 1.5em; top: 10px; }
         }
 
+        /* ZONAS TRANSPARENTES */
         .zona-interactiva { 
             position: absolute; cursor: pointer; border-radius: 15px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             transition: 0.3s; border: 3px solid; 
+            background: transparent !important; /* Totalmente transparente */
         }
         
-        #zona-norte { border-color: var(--norte); background: rgba(52,152,219,0.1); }
-        #zona-central { border-color: var(--central); background: rgba(243,156,18,0.1); }
-        #zona-sur { border-color: var(--sur); background: rgba(155,89,182,0.1); }
-        .zona-activa { box-shadow: inset 0 0 20px rgba(255,255,255,0.2); background: rgba(255,255,255,0.05) !important; border-width: 5px !important; }
+        #zona-norte { border-color: var(--norte); }
+        #zona-central { border-color: var(--central); }
+        #zona-sur { border-color: var(--sur); }
+        
+        .zona-activa { 
+            box-shadow: 0 0 20px rgba(255,255,255,0.3); 
+            border-width: 6px !important; 
+        }
 
         .nombre-zona-mapa { 
             font-weight: 800; font-size: 1.2vw; text-transform: uppercase; 
-            margin-bottom: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); letter-spacing: 1px;
+            margin-bottom: 25px; /* Separación de iconos */
+            text-shadow: 2px 2px 5px rgba(0,0,0,1); /* Sombra fuerte para leer bien sobre el fondo */
+            letter-spacing: 1px;
         }
 
         .side-panel { 
@@ -81,28 +107,33 @@
 </head>
 <body onload="mostrarInfo('Zona Central')">
 
+    <div class="titulo-vegas">🎰 PARKING LAS VEGAS 🎲</div>
+
     <div class="contenedor-principal">
         <div class="map-container">
             <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
+            
             <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%;" onclick="mostrarInfo('Zona Central')">
-                <span class="nombre-zona-mapa" style="color:var(--central);">Parking Central</span>
+                <span class="nombre-zona-mapa" style="color:var(--central);">Zona Central</span>
                 <div style="display:flex; gap:10px;"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
             </div>
+            
             <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
-                <span class="nombre-zona-mapa" style="color:var(--norte);">Parking Norte</span>
+                <span class="nombre-zona-mapa" style="color:var(--norte);">Zona Norte</span>
                 <div style="display:flex; gap:10px;"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
             </div>
+            
             <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
-                <span class="nombre-zona-mapa" style="color:var(--sur);">Parking Sur</span>
+                <span class="nombre-zona-mapa" style="color:var(--sur);">Zona Sur</span>
                 <div style="display:flex; gap:10px;"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
             </div>
         </div>
     </div>
 
     <div class="side-panel">
-        <h2 style="margin:0 0 20px 0; font-size: 1.8em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
+        <h2 style="margin:0 0 20px 0; font-size: 1.8em; text-align: center;">Smart <span style="color:var(--norte); font-weight:300;">System</span></h2>
         
-        <h3 style="font-size: 0.85em; color: #666; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 1px;">Estado General</h3>
+        <h3 style="font-size: 0.85em; color: #666; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 1px;">Otras Zonas Disponibles</h3>
         <div id="otras-zonas"></div>
 
         <h3 style="font-size: 0.85em; color: #666; text-transform: uppercase; margin: 15px 0 10px 0; letter-spacing: 1px;">Detalle Seleccionado</h3>
@@ -134,17 +165,18 @@
                 if (led) led.className = data[pin] === 1 ? 'led led-on' : 'led led-off';
             }
 
-            // OTRAS ZONAS
+            // OTRAS ZONAS (Ocultando la seleccionada)
             let htmlOtras = "";
             for (let z in CONFIG) {
+                if (z === zonaActual) continue; 
+
                 let zC = CONFIG[z];
                 let lA = data[zC.pines[0]] === 0 ? "♿" : "";
                 let lB = data[zC.pines[1]] === 0 ? "🚗" : "";
-                let activaStyle = (z === zonaActual) ? `style="border-left-width: 10px; background: #333;"` : "";
                 
                 htmlOtras += `
-                    <div class="mini-box" style="border-left-color: ${zC.color}" ${activaStyle} onclick="mostrarInfo('${z}')">
-                        <span style="font-weight:bold; ${z===zonaActual ? 'color:white;' : 'color:#bbb;'}">${z}</span>
+                    <div class="mini-box" style="border-left-color: ${zC.color}" onclick="mostrarInfo('${z}')">
+                        <span style="font-weight:bold; color:#bbb;">${z}</span>
                         <div>
                             <span style="color:#2ecc71; font-size:1.2em;">${lA} ${lB}</span>
                             ${lA==="" && lB==="" ? '<span style="color:#e74c3c; font-size:0.8em; font-weight:bold;">COMPLETO</span>' : ''}
@@ -153,7 +185,7 @@
             }
             document.getElementById('otras-zonas').innerHTML = htmlOtras;
 
-            // ZONA SELECCIONADA
+            // DETALLE ZONA SELECCIONADA
             const c = CONFIG[zonaActual];
             const libA = data[c.pines[0]] === 0 ? 1 : 0;
             const libB = data[c.pines[1]] === 0 ? 1 : 0;
@@ -187,11 +219,11 @@
                 }
                 if (maxL > 0) {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
-                        <b style="color:#e74c3c; font-size:0.9em; text-transform:uppercase;">⚠️ PARKING ${zonaActual.split(' ')[1].toUpperCase()} COMPLETO</b><br>
+                        <b style="color:#e74c3c; font-size:0.9em; text-transform:uppercase;">⚠️ ${zonaActual.toUpperCase()} COMPLETA</b><br>
                         <p style="margin:10px 0 0 0; font-size:0.95em;">Le sugerimos ir a la <b>${mejor}</b>:<br><br>${hRec}</p>
                     </div>`;
                 } else {
-                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold;">🚨 PARKING COMPLETO</div>`;
+                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold;">🚨 TODO EL PARKING ESTÁ COMPLETO</div>`;
                 }
             } else { aviso.innerHTML = ""; }
         }
