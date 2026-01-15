@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Parking Ociopia</title>
+    <title>Smart Parking</title>
     <style>
         :root {
             --norte: #3498db; --sur: #e74c3c; --central: #f39c12;
@@ -16,6 +16,7 @@
             display: flex; flex-direction: row; height: 100vh; overflow: hidden;
         }
 
+        /* --- CONTENEDOR MAPA --- */
         .contenedor-principal { 
             flex: 3; position: relative; display: flex; 
             justify-content: center; align-items: center; 
@@ -31,6 +32,7 @@
 
         .map-image { width: 100%; border-radius: 10px; opacity: 0.4; display: block; }
 
+        /* --- ICONOS (LEDS) --- */
         .contenedor-leds { display: flex; gap: 10px; margin-top: 5px; }
         .led { 
             width: 40px; height: 40px; 
@@ -41,11 +43,13 @@
         .led-off { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: #000; }
         .led-on { background: #e74c3c; box-shadow: 0 0 15px #e74c3c; color: #fff; }
 
+        /* --- RESPONSIVO MÓVIL --- */
         @media (max-width: 1000px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
             .contenedor-principal { padding: 10px !important; height: auto; order: 1; }
             .side-panel { width: 100% !important; border-left: none !important; padding: 25px !important; order: 2; height: auto !important; }
             .led { width: 45px; height: 45px; font-size: 22px; } 
+            .nombre-zona { font-size: 16px !important; }
         }
 
         .zona-interactiva { 
@@ -60,6 +64,7 @@
 
         .nombre-zona { font-weight: 800; font-size: 1.1vw; text-transform: uppercase; }
 
+        /* --- PANEL LATERAL --- */
         .side-panel { 
             width: 380px; background: var(--panel-bg); padding: 30px; 
             border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh;
@@ -86,10 +91,9 @@
 
         .big-num { font-size: 4em; font-weight: bold; margin: 0; line-height: 1; }
         .label-plaza { color: #888; font-size: 0.8em; text-transform: uppercase; font-weight: bold; display: block; }
-
-        /* Estilo para los iconos de recomendación */
+        
         .rec-item { display: inline-flex; align-items: center; background: #1a1a1a; padding: 4px 10px; border-radius: 8px; margin: 0 4px; border: 1px solid #333; }
-        .rec-val { font-weight: bold; color: #2ecc71; margin-right: 5px; font-size: 1.1em; }
+        .rec-val { font-weight: bold; color: #2ecc71; margin-right: 5px; }
     </style>
 </head>
 <body onload="mostrarInfo('Zona Central')">
@@ -100,26 +104,15 @@
 
             <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%;" onclick="mostrarInfo('Zona Central')">
                 <span class="nombre-zona" style="color:var(--central);">Central</span>
-                <div class="contenedor-leds">
-                    <div id="led-p6" class="led">♿</div>
-                    <div id="led-p7" class="led">🚗</div>
-                </div>
+                <div class="contenedor-leds"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
             </div>
-
             <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
                 <span class="nombre-zona" style="color:var(--norte);">Norte</span>
-                <div class="contenedor-leds">
-                    <div id="led-p2" class="led">♿</div>
-                    <div id="led-p3" class="led">🚗</div>
-                </div>
+                <div class="contenedor-leds"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
             </div>
-
             <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
                 <span class="nombre-zona" style="color:var(--sur);">Sur</span>
-                <div class="contenedor-leds">
-                    <div id="led-p4" class="led">♿</div>
-                    <div id="led-p5" class="led">🚗</div>
-                </div>
+                <div class="contenedor-leds"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
             </div>
         </div>
     </div>
@@ -180,32 +173,22 @@
 
         function gestionarRecomendacion(data) {
             let aviso = document.getElementById('aviso-zona');
-            let pA = CONFIG[zonaActual].pines[0], pB = CONFIG[zonaActual].pines[1];
-            
-            if (data[pA] === 1 && data[pB] === 1) {
-                let mejor = ""; let maxLibres = -1;
-                let htmlRec = "";
-
+            if (data[CONFIG[zonaActual].pines[0]] === 1 && data[CONFIG[zonaActual].pines[1]] === 1) {
+                let mejor = ""; let maxLibres = -1; let htmlRec = "";
                 for (let z in CONFIG) {
                     if (z === zonaActual) continue;
-                    let libAdaptada = data[CONFIG[z].pines[0]] === 0 ? 1 : 0;
-                    let libNormal = data[CONFIG[z].pines[1]] === 0 ? 1 : 0;
-                    let totalLibres = libAdaptada + libNormal;
-
-                    if (totalLibres > maxLibres) {
-                        maxLibres = totalLibres;
-                        mejor = z;
-                        htmlRec = "";
-                        if(libAdaptada > 0) htmlRec += `<span class="rec-item"><span class="rec-val">${libAdaptada}</span>♿</span>`;
-                        if(libNormal > 0) htmlRec += `<span class="rec-item"><span class="rec-val">${libNormal}</span>🚗</span>`;
+                    let libA = data[CONFIG[z].pines[0]] === 0 ? 1 : 0;
+                    let libB = data[CONFIG[z].pines[1]] === 0 ? 1 : 0;
+                    if ((libA + libB) > maxLibres) {
+                        maxLibres = libA + libB; mejor = z;
+                        htmlRec = (libA > 0 ? `<span class="rec-item"><span class="rec-val">${libA}</span>♿</span>` : "") +
+                                  (libB > 0 ? `<span class="rec-item"><span class="rec-val">${libB}</span>🚗</span>` : "");
                     }
                 }
-
                 if (maxLibres > 0) {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
-                        <b style="color:#e74c3c; font-size:1.1em; text-transform:uppercase;">⚠️ PARKING ${zonaActual.split(' ')[1].toUpperCase()} COMPLETO</b><br>
-                        <p style="margin:12px 0 0 0; font-size:0.95em;">Le sugerimos ir a la <b>${mejor}</b>:<br><br>
-                        ${htmlRec}</p>
+                        <b style="color:#e74c3c; text-transform:uppercase;">⚠️ PARKING ${zonaActual.split(' ')[1].toUpperCase()} COMPLETO</b><br>
+                        <p style="margin:12px 0 0 0; font-size:0.95em;">Le sugerimos ir a la <b>${mejor}</b>:<br><br>${htmlRec}</p>
                     </div>`;
                 } else {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold;">🚨 PARKING COMPLETO</div>`;
