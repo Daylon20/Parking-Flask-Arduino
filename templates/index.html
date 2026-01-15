@@ -6,7 +6,7 @@
     <title>Smart Parking</title>
     <style>
         :root {
-            --norte: #3498db; --sur: #e74c3c; --central: #f39c12;
+            --norte: #3498db; --sur: #9b59b6; --central: #f39c12; /* Sur cambiado a Violeta */
             --bg-dark: #121212; --panel-bg: #1e1e1e;
         }
 
@@ -16,84 +16,58 @@
             display: flex; flex-direction: row; height: 100vh; overflow: hidden;
         }
 
-        /* --- CONTENEDOR MAPA --- */
         .contenedor-principal { 
             flex: 3; position: relative; display: flex; 
             justify-content: center; align-items: center; 
-            padding: 20px; background: #111; 
+            padding: 20px; background: #111; width: 100%;
         }
         
         .map-container { 
             position: relative; background: #222; border-radius: 15px; 
             padding: 10px; width: 100%; max-width: 1000px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            border: 1px solid #333;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid #333; margin: auto;
         }
 
-        .map-image { width: 100%; border-radius: 10px; opacity: 0.4; display: block; }
+        .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.4; display: block; margin: 0 auto; }
 
-        /* --- ICONOS (LEDS) --- */
-        .contenedor-leds { display: flex; gap: 10px; margin-top: 5px; }
         .led { 
-            width: 40px; height: 40px; 
-            border-radius: 10px; display: flex; align-items: center; 
-            justify-content: center; font-weight: bold; font-size: 20px;
-            transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
+            width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; 
+            justify-content: center; font-weight: bold; font-size: 20px; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
         }
         .led-off { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: #000; }
         .led-on { background: #e74c3c; box-shadow: 0 0 15px #e74c3c; color: #fff; }
 
-        /* --- RESPONSIVO MÓVIL --- */
         @media (max-width: 1000px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
-            .contenedor-principal { padding: 10px !important; height: auto; order: 1; }
-            .side-panel { width: 100% !important; border-left: none !important; padding: 25px !important; order: 2; height: auto !important; }
-            .led { width: 45px; height: 45px; font-size: 22px; } 
-            .nombre-zona { font-size: 16px !important; }
+            .contenedor-principal { padding: 10px 0 !important; width: 100vw; }
+            .side-panel { width: 100% !important; height: auto !important; border-left: none !important; }
+            .map-container { width: 95%; }
         }
 
         .zona-interactiva { 
             position: absolute; cursor: pointer; border-radius: 15px; 
-            display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; transition: 0.3s; 
-            border: 2px solid rgba(255,255,255,0.1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: 0.3s; border: 2px solid rgba(255,255,255,0.1);
         }
         .zona-activa.norte { border-color: var(--norte); background: rgba(52,152,219,0.15); }
         .zona-activa.central { border-color: var(--central); background: rgba(243,156,18,0.15); }
-        .zona-activa.sur { border-color: var(--sur); background: rgba(231,76,60,0.15); }
+        .zona-activa.sur { border-color: var(--sur); background: rgba(155,89,182,0.15); }
 
-        .nombre-zona { font-weight: 800; font-size: 1.1vw; text-transform: uppercase; }
-
-        /* --- PANEL LATERAL --- */
         .side-panel { 
-            width: 380px; background: var(--panel-bg); padding: 30px; 
-            border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh;
+            width: 400px; background: var(--panel-bg); padding: 25px; 
+            border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh; overflow-y: auto;
         }
 
-        .stat-box { 
-            background: #2a2a2a; padding: 20px; border-radius: 20px; 
-            margin-bottom: 20px; border-top: 5px solid #444; 
-        }
+        .stat-box { background: #2a2a2a; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-top: 5px solid #444; }
+        .mini-box { background: #252525; padding: 12px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #444; }
 
-        .donut-chart {
-            width: 100px; height: 100px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 15px auto; position: relative;
-        }
-        .donut-chart::after {
-            content: ''; position: absolute; width: 75px; height: 75px;
-            background: #2a2a2a; border-radius: 50%;
-        }
-        .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.6em; }
+        .donut-chart { width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 10px auto; position: relative; }
+        .donut-chart::after { content: ''; position: absolute; width: 70px; height: 70px; background: #2a2a2a; border-radius: 50%; }
+        .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.4em; }
 
-        .titulo-grafica { text-align: center; font-size: 0.85em; color: #888; text-transform: uppercase; }
-        .nombre-zona-panel { text-align: center; font-size: 1.8em; font-weight: bold; margin-bottom: 5px; }
-
-        .big-num { font-size: 4em; font-weight: bold; margin: 0; line-height: 1; }
-        .label-plaza { color: #888; font-size: 0.8em; text-transform: uppercase; font-weight: bold; display: block; }
-        
-        .rec-item { display: inline-flex; align-items: center; background: #1a1a1a; padding: 4px 10px; border-radius: 8px; margin: 0 4px; border: 1px solid #333; }
-        .rec-val { font-weight: bold; color: #2ecc71; margin-right: 5px; }
+        .big-num { font-size: 3.5em; font-weight: bold; margin: 0; line-height: 1; }
+        .rec-item { display: inline-flex; align-items: center; background: #1a1a1a; padding: 4px 8px; border-radius: 8px; margin: 0 3px; border: 1px solid #333; }
+        .rec-val { font-weight: bold; color: #2ecc71; margin-right: 4px; }
     </style>
 </head>
 <body onload="mostrarInfo('Zona Central')">
@@ -101,36 +75,37 @@
     <div class="contenedor-principal">
         <div class="map-container">
             <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
-
             <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%;" onclick="mostrarInfo('Zona Central')">
-                <span class="nombre-zona" style="color:var(--central);">Central</span>
-                <div class="contenedor-leds"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
+                <span style="color:var(--central); font-weight:800;">CENTRAL</span>
+                <div style="display:flex; gap:8px; margin-top:5px;"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
             </div>
             <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
-                <span class="nombre-zona" style="color:var(--norte);">Norte</span>
-                <div class="contenedor-leds"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
+                <span style="color:var(--norte); font-weight:800;">NORTE</span>
+                <div style="display:flex; gap:8px; margin-top:5px;"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
             </div>
             <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
-                <span class="nombre-zona" style="color:var(--sur);">Sur</span>
-                <div class="contenedor-leds"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
+                <span style="color:var(--sur); font-weight:800;">SUR</span>
+                <div style="display:flex; gap:8px; margin-top:5px;"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
             </div>
         </div>
     </div>
 
     <div class="side-panel">
-        <h2 style="margin:0 0 25px 0; font-size: 2em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
-        <div id="detalle-zona"></div>
+        <h2 style="margin:0 0 20px 0; font-size: 1.8em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
+        
+        <div id="zona-seleccionada"></div>
         <div id="aviso-zona"></div>
-        <div style="flex-grow: 1;"></div>
+        
+        <h3 style="font-size: 0.9em; color: #666; text-transform: uppercase; margin: 10px 0;">Otras Zonas</h3>
+        <div id="otras-zonas"></div>
     </div>
 
     <script>
         let estadosPines = { p2:0, p3:0, p4:0, p5:0, p6:0, p7:0 };
         let zonaActual = "Zona Central";
-
         const CONFIG = {
             "Zona Norte":   { id: 'zona-norte', pines: ['p2', 'p3'], color: "#3498db" },
-            "Zona Sur":     { id: 'zona-sur', pines: ['p4', 'p5'], color: "#e74c3c" },
+            "Zona Sur":     { id: 'zona-sur', pines: ['p4', 'p5'], color: "#9b59b6" }, // Violeta
             "Zona Central": { id: 'zona-central', pines: ['p6', 'p7'], color: "#f39c12" }
         };
 
@@ -145,50 +120,64 @@
             estadosPines = data;
             for (let pin in data) {
                 let led = document.getElementById('led-' + pin);
-                if (led) { led.className = data[pin] === 1 ? 'led led-on' : 'led led-off'; }
+                if (led) led.className = data[pin] === 1 ? 'led led-on' : 'led led-off';
             }
 
+            // 1. RENDER ZONA SELECCIONADA
             const c = CONFIG[zonaActual];
-            const adaptada = data[c.pines[0]] === 0 ? 1 : 0;
-            const normal = data[c.pines[1]] === 0 ? 1 : 0;
-            const ocupadas = (data[c.pines[0]] === 1 ? 1 : 0) + (data[c.pines[1]] === 1 ? 1 : 0);
-            const porc = (ocupadas / 2) * 100;
+            const libA = data[c.pines[0]] === 0 ? 1 : 0;
+            const libB = data[c.pines[1]] === 0 ? 1 : 0;
+            const porc = (( (data[c.pines[0]] === 1 ? 1:0) + (data[c.pines[1]] === 1 ? 1:0) ) / 2) * 100;
 
-            document.getElementById('detalle-zona').innerHTML = `
+            document.getElementById('zona-seleccionada').innerHTML = `
                 <div class="stat-box" style="border-top-color: ${c.color}">
-                    <div class="nombre-zona-panel" style="color:${c.color}">${zonaActual}</div>
-                    <div class="titulo-grafica">Ocupación</div>
-                    <div class="donut-chart" style="background: conic-gradient(${c.color} ${porc}%, #444 0);">
-                        <span class="donut-text">${porc}%</span>
-                    </div>
-                    <div style="display:flex; justify-content: space-around; text-align:center; margin-top:20px;">
-                        <div><span class="label-plaza">Plaza Libre</span><br><span class="big-num">${normal}</span></div>
-                        <div style="border-left: 1px solid #333; padding-left: 15px;">
-                            <span class="label-plaza">Adaptada</span><br><span class="big-num" style="color:#3498db">${adaptada}</span>
-                        </div>
+                    <div style="text-align:center; font-size:1.6em; font-weight:bold; color:${c.color}">${zonaActual}</div>
+                    <div style="text-align:center; font-size:0.8em; color:#888; text-transform:uppercase;">Ocupación</div>
+                    <div class="donut-chart" style="background: conic-gradient(${c.color} ${porc}%, #444 0);"><span class="donut-text">${porc}%</span></div>
+                    <div style="display:flex; justify-content: space-around; text-align:center;">
+                        <div><span style="font-size:0.7em; color:#888;">LIBRE</span><br><span class="big-num">${libB}</span></div>
+                        <div><span style="font-size:0.7em; color:#888;">ADAPTADA</span><br><span class="big-num" style="color:#3498db">${libA}</span></div>
                     </div>
                 </div>`;
+
+            // 2. RENDER OTRAS ZONAS (MINI)
+            let htmlOtras = "";
+            for (let z in CONFIG) {
+                if (z === zonaActual) continue;
+                let zC = CONFIG[z];
+                let lA = data[zC.pines[0]] === 0 ? "♿" : "";
+                let lB = data[zC.pines[1]] === 0 ? "🚗" : "";
+                htmlOtras += `
+                    <div class="mini-box" style="border-left-color: ${zC.color}" onclick="mostrarInfo('${z}')">
+                        <span style="font-weight:bold;">${z}</span>
+                        <div>
+                            <span style="color:#2ecc71; font-size:1.2em;">${lA} ${lB}</span>
+                            ${lA==="" && lB==="" ? '<span style="color:#e74c3c; font-size:0.8em;">LLENO</span>' : ''}
+                        </div>
+                    </div>`;
+            }
+            document.getElementById('otras-zonas').innerHTML = htmlOtras;
             gestionarRecomendacion(data);
         }
 
         function gestionarRecomendacion(data) {
             let aviso = document.getElementById('aviso-zona');
             if (data[CONFIG[zonaActual].pines[0]] === 1 && data[CONFIG[zonaActual].pines[1]] === 1) {
-                let mejor = ""; let maxLibres = -1; let htmlRec = "";
+                let mejor = ""; let maxL = -1; let hRec = "";
                 for (let z in CONFIG) {
                     if (z === zonaActual) continue;
-                    let libA = data[CONFIG[z].pines[0]] === 0 ? 1 : 0;
-                    let libB = data[CONFIG[z].pines[1]] === 0 ? 1 : 0;
-                    if ((libA + libB) > maxLibres) {
-                        maxLibres = libA + libB; mejor = z;
-                        htmlRec = (libA > 0 ? `<span class="rec-item"><span class="rec-val">${libA}</span>♿</span>` : "") +
-                                  (libB > 0 ? `<span class="rec-item"><span class="rec-val">${libB}</span>🚗</span>` : "");
+                    let a = data[CONFIG[z].pines[0]] === 0 ? 1 : 0;
+                    let b = data[CONFIG[z].pines[1]] === 0 ? 1 : 0;
+                    if ((a+b) > maxL) {
+                        maxL = a+b; mejor = z;
+                        hRec = (a > 0 ? `<span class="rec-item"><span class="rec-val">${a}</span>♿</span>` : "") +
+                               (b > 0 ? `<span class="rec-item"><span class="rec-val">${b}</span>🚗</span>` : "");
                     }
                 }
-                if (maxLibres > 0) {
+                if (maxL > 0) {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
-                        <b style="color:#e74c3c; text-transform:uppercase;">⚠️ PARKING ${zonaActual.split(' ')[1].toUpperCase()} COMPLETO</b><br>
-                        <p style="margin:12px 0 0 0; font-size:0.95em;">Le sugerimos ir a la <b>${mejor}</b>:<br><br>${htmlRec}</p>
+                        <b style="color:#e74c3c; font-size:0.9em;">⚠️ PARKING ${zonaActual.split(' ')[1].toUpperCase()} COMPLETO</b><br>
+                        <p style="margin:10px 0 0 0; font-size:0.9em;">Le sugerimos ir a la <b>${mejor}</b>:<br><br>${hRec}</p>
                     </div>`;
                 } else {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold;">🚨 PARKING COMPLETO</div>`;
@@ -196,9 +185,7 @@
             } else { aviso.innerHTML = ""; }
         }
 
-        function refrescar() {
-            fetch('/status').then(r => r.json()).then(d => actualizarInterfaz(d)).catch(() => {});
-        }
+        function refrescar() { fetch('/status').then(r => r.json()).then(d => actualizarInterfaz(d)).catch(() => {}); }
         setInterval(refrescar, 2000);
     </script>
 </body>
