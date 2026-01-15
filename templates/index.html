@@ -69,6 +69,7 @@
             border: 2px solid rgba(255,255,255,0.05);
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(2px);
+            overflow: hidden; /* Importante para el escáner */
         }
 
         .zona-interactiva:hover {
@@ -90,10 +91,39 @@
             padding: 4px 12px; 
             border-radius: 8px; 
             margin-bottom: 10px; 
+            z-index: 2; /* Para que esté por encima del escáner */
         }
 
+        /* --- ESCÁNER LÁSER --- */
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px; /* Altura de la línea */
+            background: linear-gradient(to right, transparent, var(--norte), transparent); /* Color del escáner */
+            animation: scan 2s infinite linear;
+            z-index: 1;
+            opacity: 0;
+        }
+        .zona-activa .scanner-line {
+            opacity: 1;
+        }
+
+        /* Colores específicos para el escáner */
+        .zona-activa.norte .scanner-line { background: linear-gradient(to right, transparent, var(--norte), transparent); }
+        .zona-activa.central .scanner-line { background: linear-gradient(to right, transparent, var(--central), transparent); }
+        .zona-activa.sur .scanner-line { background: linear-gradient(to right, transparent, var(--sur), transparent); }
+
+
+        @keyframes scan {
+            0% { transform: translateY(0%); }
+            100% { transform: translateY(calc(100% - 5px)); }
+        }
+
+
         /* --- LEDS NEÓN --- */
-        .contenedor-leds { display: flex; gap: 12px; }
+        .contenedor-leds { display: flex; gap: 12px; z-index: 2; } /* Z-index para que se vea */
         .led { 
             width: 1.8vw; height: 1.8vw; min-width: 18px; min-height: 18px; 
             border-radius: 6px; 
@@ -131,6 +161,35 @@
         
         #historial { height: 200px; overflow-y: auto; font-size: 0.9em; }
 
+        /* --- ANILLO DE OCUPACIÓN --- */
+        .donut-chart-container {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: conic-gradient(#2ecc71 0% 0%, #3a3a3a 0% 100%); /* Inicialmente vacío */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 0 auto 10px auto;
+            transition: background 1s ease-out; /* Animación del relleno */
+        }
+        .donut-chart-container::before {
+            content: '';
+            position: absolute;
+            background: #2a2a2a; /* Color del centro */
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+        }
+        .donut-percentage {
+            position: relative;
+            z-index: 1;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+        }
+
         /* BOTÓN SIMULADOR */
         .btn-simulador {
             position: fixed;
@@ -148,6 +207,15 @@
             transition: 0.3s;
         }
         .btn-simulador:hover { transform: scale(1.1); background: #8e44ad; }
+
+        /* Animación Shake para el aviso */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(5px); }
+            50% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
     </style>
 </head>
 <body onload="mostrarInfo('Zona Central')">
@@ -164,6 +232,7 @@
                     <div id="led-p6" class="led led-adaptada"></div>
                     <div id="led-p7" class="led"></div>
                 </div>
+                <div class="scanner-line"></div>
             </div>
 
             <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
@@ -172,6 +241,7 @@
                     <div id="led-p2" class="led led-adaptada"></div>
                     <div id="led-p3" class="led"></div>
                 </div>
+                <div class="scanner-line"></div>
             </div>
 
             <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
@@ -180,6 +250,7 @@
                     <div id="led-p4" class="led led-adaptada"></div>
                     <div id="led-p5" class="led"></div>
                 </div>
+                <div class="scanner-line"></div>
             </div>
         </div>
     </div>
@@ -205,9 +276,9 @@
         let modoSimulacion = false;
 
         const CONFIG = {
-            "Zona Norte":   { id: 'zona-norte', totales: 41,  adaptadas: 4, pines: ['p2', 'p3'], color: "#3498db" },
-            "Zona Sur":     { id: 'zona-sur', totales: 27,  adaptadas: 2, pines: ['p4', 'p5'], color: "#e74c3c" },
-            "Zona Central": { id: 'zona-central', totales: 189, adaptadas: 9, pines: ['p6', 'p7'], color: "#f39c12" }
+            "Zona Norte":   { id: 'zona-norte', totales: 41,  adaptadas: 4, pines: ['p2', 'p3'], color: "var(--norte)" },
+            "Zona Sur":     { id: 'zona-sur', totales: 27,  adaptadas: 2, pines: ['p4', 'p5'], color: "var(--sur)" },
+            "Zona Central": { id: 'zona-central', totales: 189, adaptadas: 9, pines: ['p6', 'p7'], color: "var(--central)" }
         };
 
         function alternarSimulacion() {
@@ -220,25 +291,40 @@
 
         function simular() {
             if(!modoSimulacion) return;
+            
             let mockData = {
                 p2: Math.round(Math.random()), p3: Math.round(Math.random()),
                 p4: Math.round(Math.random()), p5: Math.round(Math.random()),
                 p6: Math.round(Math.random()), p7: Math.round(Math.random())
             };
+            
+            // Opcional: para forzar que la zona actual esté llena en la simulación
+            // mockData[CONFIG[zonaActual].pines[0]] = 1;
+            // mockData[CONFIG[zonaActual].pines[1]] = 1;
+
             actualizarInterfazVisual(mockData);
-            setTimeout(simular, 2000);
+            setTimeout(simular, 2000); 
         }
 
         function mostrarInfo(nombre) {
             zonaActual = nombre;
-            document.querySelectorAll('.zona-interactiva').forEach(z => z.classList.remove('zona-activa', 'norte', 'central', 'sur'));
+            
+            // Quitar clase activa y scanner de todas
+            document.querySelectorAll('.zona-interactiva').forEach(z => {
+                z.classList.remove('zona-activa', 'norte', 'central', 'sur');
+                z.querySelector('.scanner-line').style.opacity = 0; // Oculta el escáner
+            });
+            
+            // Añadir clase activa y scanner a la seleccionada
             const zCfg = CONFIG[nombre];
             const el = document.getElementById(zCfg.id);
             el.classList.add('zona-activa');
             if(nombre.includes("Norte")) el.classList.add('norte');
             if(nombre.includes("Central")) el.classList.add('central');
             if(nombre.includes("Sur")) el.classList.add('sur');
-            actualizarInterfazVisual(estadosPines);
+            el.querySelector('.scanner-line').style.opacity = 1; // Muestra el escáner
+
+            actualizarInterfazVisual(estadosPines); // Actualiza el panel con los datos actuales
         }
 
         function actualizar() {
@@ -246,58 +332,127 @@
             fetch('/status')
                 .then(res => res.json())
                 .then(data => actualizarInterfazVisual(data))
-                .catch(err => console.error("Error:", err));
+                .catch(err => console.error("Error al recibir datos:", err));
         }
 
         function actualizarInterfazVisual(data) {
-            estadosPines = data;
+            estadosPines = data; // Aseguramos que los datos globales se actualizan
 
-            // Historial
+            // 1. Historial
             for (let pin in data) {
                 if (data[pin] !== ultimosEstados[pin]) {
                     let accion = data[pin] === 1 ? '<span style="color:#e74c3c">OCUPADA</span>' : '<span style="color:#2ecc71">LIBERADA</span>';
                     let zonaNom = (pin === 'p2' || pin === 'p3') ? "Norte" : (pin === 'p4' || pin === 'p5') ? "Sur" : "Central";
+                    let tipo = (parseInt(pin.substring(1)) % 2 === 0) ? "♿" : "🚗";
+                    
                     let log = document.createElement('div');
-                    log.innerHTML = `<small>${new Date().toLocaleTimeString()}</small> <b>${zonaNom}</b> ${accion}`;
+                    log.style.padding = "8px 0";
+                    log.style.borderBottom = "1px solid #333";
+                    log.style.animation = "fadeIn 0.5s ease";
+                    log.innerHTML = `<small style="color:#666">${new Date().toLocaleTimeString()}</small> ${tipo} <b>${zonaNom}</b> ${accion}`;
+                    
                     document.getElementById('historial').prepend(log);
                     ultimosEstados[pin] = data[pin];
                 }
             }
 
-            // LEDs y Panel (Igual que antes)
-            let ocupadas = Object.values(data).reduce((a, b) => a + b, 0);
-            document.getElementById('msg-principal').innerText = ocupadas === 6 ? "🚨 PARKING LLENO" : "✅ DISPONIBLE";
+            // 2. Estado General
+            let ocupadasGlobales = Object.values(data).reduce((a, b) => a + b, 0);
+            const msgP = document.getElementById('msg-principal');
+            const cajaP = document.getElementById('status-general');
             
-            for (let i = 2; i <= 7; i++) {
-                let led = document.getElementById('led-p' + i);
-                if (led) led.className = data['p' + i] === 1 ? 'led led-on' : 'led led-off';
-                if (i % 2 === 0 && led) led.classList.add('led-adaptada');
+            if (ocupadasGlobales === 6) { // Si todos los pines están ocupados
+                msgP.innerText = "🚨 PARKING LLENO";
+                cajaP.style.borderTopColor = "#e74c3c";
+            } else {
+                msgP.innerText = "✅ DISPONIBLE";
+                cajaP.style.borderTopColor = "#2ecc71";
             }
 
+            // 3. LEDs Neón
+            for (let i = 2; i <= 7; i++) {
+                let led = document.getElementById('led-p' + i);
+                if (led) {
+                    led.className = data['p' + i] === 1 ? 'led led-on' : 'led led-off';
+                    if (i % 2 === 0) led.classList.add('led-adaptada');
+                }
+            }
+
+            // 4. Panel Detalle (con Anillo de Ocupación)
             const z = zonaActual;
             const c = CONFIG[z];
+            
+            // Calcular ocupación de la zona actual
+            let ocupadasZona = (data[c.pines[0]] === 1 ? 1 : 0) + (data[c.pines[1]] === 1 ? 1 : 0);
+            let totalPinesZona = 2; // Siempre 2 pines por zona
+            let porcentajeOcupacion = (ocupadasZona / totalPinesZona) * 100;
+            
             document.getElementById('detalle-zona').innerHTML = `
                 <div class="stat-box" style="border-left-color: ${c.color}">
-                    <h3 style="margin:0; color:${c.color}">${z}</h3>
-                    <div style="display:flex; justify-content:space-around; margin-top:10px;">
-                        <div><small>ESTÁNDAR</small><br><span class="big-num">${c.totales - data[c.pines[1]]}</span></div>
-                        <div><small>ADAPTADA</small><br><span class="big-num" style="color:#3498db">${c.adaptadas - data[c.pines[0]]}</span></div>
+                    <h3 style="margin:0; color:${c.color}; font-size:0.8em; text-transform:uppercase;">Detalle ${z}</h3>
+                    <div style="display:flex; justify-content:space-around; align-items:center; margin-top:15px;">
+                        <div class="donut-chart-container" style="background: conic-gradient(#e74c3c 0% ${porcentajeOcupacion}%, #3a3a3a ${porcentajeOcupacion}% 100%);">
+                            <span class="donut-percentage">${Math.round(porcentajeOcupacion)}%</span>
+                        </div>
+                        <div style="text-align:center;">
+                            <small style="color:#888">ESTÁNDAR</small><br>
+                            <span class="big-num" style="color:white">${c.totales - (data[c.pines[1]] === 1 ? 1 : 0)}</span>
+                        </div>
+                        <div style="text-align:center;">
+                            <small style="color:#888">ADAPTADA</small><br>
+                            <span class="big-num" style="color:#3498db">${c.adaptadas - (data[c.pines[0]] === 1 ? 1 : 0)}</span>
+                        </div>
                     </div>
                 </div>`;
             
             gestionarRecomendacion(data);
         }
 
+        // --- FUNCIÓN DE RECOMENDACIÓN FINAL ---
         function gestionarRecomendacion(data) {
             let aviso = document.getElementById('aviso-zona');
-            let pA = CONFIG[zonaActual].pines[0], pB = CONFIG[zonaActual].pines[1];
-            if (data[pA] === 1 && data[pB] === 1) {
-                let mejor = "Zona Central"; // Lógica simplificada para el ejemplo
-                aviso.innerHTML = `<div class="stat-box" style="border-left-color:#e74c3c;">⚠️ ZONA LLENA. Ir a: <b>${mejor}</b></div>`;
-            } else { aviso.innerHTML = ""; }
+            let pA = CONFIG[zonaActual].pines[0];
+            let pB = CONFIG[zonaActual].pines[1];
+            
+            if (data[pA] === 1 && data[pB] === 1) { // Si los dos pines de la zona seleccionada están Ocupados
+                let mejorZona = "";
+                let maxLibres = -1;
+
+                for (let z in CONFIG) {
+                    if (z === zonaActual) continue;
+                    let libres = (data[CONFIG[z].pines[0]] === 0 ? 1 : 0) + (data[CONFIG[z].pines[1]] === 0 ? 1 : 0);
+                    
+                    if (libres > maxLibres) {
+                        maxLibres = libres;
+                        mejorZona = z;
+                    }
+                }
+                // Solo mostramos la recomendación si hay alguna zona con plazas libres
+                if (maxLibres > 0) {
+                     aviso.innerHTML = `
+                        <div class="stat-box" style="border-left: 5px solid #e74c3c; background: rgba(231, 76, 60, 0.2); animation: shake 0.5s ease; margin-top:15px;">
+                            <b style="color: #e74c3c; font-size: 1.1em;">⚠️ ${zonaActual.toUpperCase()} LLENA</b><br>
+                            <small style="color: #ccc;">No hay plazas disponibles en esta sección.</small>
+                            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">
+                                <span style="color: #2ecc71; font-weight: bold;">RECOMENDACIÓN:</span><br>
+                                <b style="color: white; font-size: 1.2em;">📍 Ir a ${mejorZona.toUpperCase()}</b>
+                            </div>
+                        </div>`;
+                } else {
+                    // Si todas las zonas están llenas, el aviso es diferente
+                     aviso.innerHTML = `
+                        <div class="stat-box" style="border-left: 5px solid #e74c3c; background: rgba(231, 76, 60, 0.2); animation: shake 0.5s ease; margin-top:15px;">
+                            <b style="color: #e74c3c; font-size: 1.1em;">🚨 PARKING COMPLETO</b><br>
+                            <small style="color: #ccc;">Todas las zonas están actualmente sin disponibilidad.</small>
+                        </div>`;
+                }
+            } else {
+                aviso.innerHTML = ""; 
+            }
         }
 
-        setInterval(actualizar, 2000);
+        setInterval(actualizar, 2000); // Esto sigue llamando al servidor real
+        mostrarInfo('Zona Central'); // Para que al cargar, una zona ya esté activa
     </script>
 </body>
 </html>
