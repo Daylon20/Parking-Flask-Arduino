@@ -16,26 +16,25 @@
             display: flex; flex-direction: row; height: 100vh; overflow: hidden;
         }
 
-        /* TÍTULO CORREGIDO: Centrado, sin neón y texto completo */
+        /* TÍTULO: A la izquierda, sin iconos y con espacio para no tapar */
         .titulo-superior {
             position: absolute;
             top: 20px;
-            left: 0;
-            width: 100%; /* Asegura centrado real */
-            z-index: 10;
+            left: 30px; /* Pegado a la izquierda con un pequeño margen */
+            z-index: 100;
             color: white;
-            font-size: 1.8em;
+            font-size: 1.6em;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-align: center;
             pointer-events: none;
         }
 
         .contenedor-principal { 
             flex: 3; position: relative; display: flex; 
             justify-content: center; align-items: center; 
-            padding: 20px; background: #111; width: 100%;
+            padding: 80px 20px 20px 20px; /* Más relleno arriba para que el título no tape el mapa */
+            background: #111; width: 100%;
         }
         
         .map-container { 
@@ -53,13 +52,21 @@
         .led-off { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: #000; }
         .led-on { background: #e74c3c; box-shadow: 0 0 15px #e74c3c; color: #fff; }
 
+        /* AJUSTES PARA MÓVIL */
         @media (max-width: 1000px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
-            .contenedor-principal { padding: 80px 0 10px 0 !important; width: 100vw; }
+            .contenedor-principal { padding: 70px 0 10px 0 !important; width: 100vw; height: auto; }
             .side-panel { width: 100% !important; height: auto !important; border-left: none !important; }
-            .map-container { width: 95%; }
+            .map-container { width: 95%; margin-top: 20px; }
             .nombre-zona-mapa { font-size: 12px !important; }
-            .titulo-superior { font-size: 1.2em; top: 10px; }
+            .titulo-superior { 
+                font-size: 1.1em; 
+                top: 15px; 
+                left: 15px; 
+                position: relative; /* Cambia a relativo en móvil para que empuje el contenido */
+                width: 100%;
+                margin-bottom: 20px;
+            }
         }
 
         .zona-interactiva { 
@@ -105,7 +112,7 @@
 </head>
 <body onload="mostrarInfo('Zona Central')">
 
-    <div class="titulo-superior">🎰 PARKING CENTRO COMERCIAL LAS VEGAS 🎲</div>
+    <div class="titulo-superior">PARKING CENTRO COMERCIAL LAS VEGAS</div>
 
     <div class="contenedor-principal">
         <div class="map-container">
