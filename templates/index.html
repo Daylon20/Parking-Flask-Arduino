@@ -3,12 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Parking Ociopia</title>
+    <title>Smart Parking Ociopia | Control Panel</title>
     <style>
         /* --- ESTILOS GENERALES --- */
+        :root {
+            --norte: #3498db;
+            --sur: #e74c3c;
+            --central: #f39c12;
+            --bg-dark: #121212;
+            --panel-bg: #1e1e1e;
+        }
+
         body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: #1a1a1a; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-dark); 
             color: white; 
             margin: 0; 
             display: flex; 
@@ -17,7 +25,7 @@
             overflow: hidden; 
         }
 
-        /* --- CONTENEDOR DEL MAPA (GRANDE EN PC) --- */
+        /* --- CONTENEDOR DEL MAPA --- */
         .contenedor-principal { 
             flex: 3; 
             position: relative; 
@@ -25,82 +33,131 @@
             justify-content: center; 
             align-items: center; 
             padding: 20px; 
-            background: #111;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
         }
         
         .map-container { 
             position: relative; 
             background: #222; 
-            border-radius: 12px; 
-            padding: 10px; 
+            border-radius: 20px; 
+            padding: 15px; 
             width: 100%;
             max-width: 1100px; 
-            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border: 1px solid #333;
         }
 
         .map-image { 
             display: block; 
             width: 100%; 
             height: auto; 
-            border-radius: 8px; 
-            opacity: 0.9; 
+            border-radius: 12px; 
+            opacity: 0.8; 
+            filter: grayscale(0.3);
         }
 
-        /* --- ZONAS INTERACTIVAS --- */
+        /* --- ZONAS INTERACTIVAS (GLASSMORPHISM) --- */
         .zona-interactiva { 
             position: absolute; 
             cursor: pointer; 
-            border-radius: 6px; 
+            border-radius: 15px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
-            transition: 0.2s;
-        }
-        .zona-interactiva:hover { background-color: rgba(255, 255, 255, 0.1); }
-        
-        .nombre-zona { 
-            font-size: 1vw; 
-            min-font-size: 10px;
-            font-weight: bold; 
-            background: rgba(0,0,0,0.8); 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            margin-bottom: 5px; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(2px);
         }
 
-        .contenedor-leds { display: flex; gap: 8px; }
-        .led { width: 1.5vw; height: 1.5vw; min-width: 15px; min-height: 15px; border: 2px solid white; border-radius: 4px; }
-        .led-adaptada { border-radius: 50%; border-color: #3498db; }
-        .led-off { background-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
-        .led-on { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
+        .zona-interactiva:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+            z-index: 10;
+        }
+
+        /* Estados Activos por Color */
+        .zona-activa.norte { border-color: var(--norte); box-shadow: 0 0 20px rgba(52,152,219,0.3); background: rgba(52,152,219,0.1); }
+        .zona-activa.central { border-color: var(--central); box-shadow: 0 0 20px rgba(243,156,18,0.3); background: rgba(243,156,18,0.1); }
+        .zona-activa.sur { border-color: var(--sur); box-shadow: 0 0 20px rgba(231,76,60,0.3); background: rgba(231,76,60,0.1); }
+        
+        .nombre-zona { 
+            font-size: 1.2vw; 
+            font-weight: 800; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(0,0,0,0.6); 
+            padding: 4px 12px; 
+            border-radius: 8px; 
+            margin-bottom: 10px; 
+            pointer-events: none;
+        }
+
+        /* --- LEDS NEÓN --- */
+        .contenedor-leds { display: flex; gap: 12px; }
+        .led { 
+            width: 1.8vw; height: 1.8vw; min-width: 18px; min-height: 18px; 
+            border-radius: 6px; 
+            transition: all 0.5s ease;
+        }
+        .led-adaptada { border-radius: 50%; }
+        
+        .led-off { 
+            background-color: #2ecc71; 
+            box-shadow: 0 0 15px #2ecc71, inset 0 0 5px rgba(255,255,255,0.5); 
+        }
+        .led-on { 
+            background-color: #e74c3c; 
+            box-shadow: 0 0 20px #e74c3c, inset 0 0 5px rgba(255,255,255,0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
         /* --- PANEL LATERAL --- */
         .side-panel { 
             width: 400px; 
-            background: #252525; 
-            border-left: 3px solid #444; 
-            padding: 25px; 
+            background: var(--panel-bg); 
+            border-left: 1px solid #333; 
+            padding: 30px; 
             box-sizing: border-box; 
-            overflow-y: auto; 
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-        .stat-box { 
-            background: #333; 
-            padding: 20px; 
-            border-radius: 15px; 
-            margin-bottom: 15px; 
-            border-top: 6px solid #666; 
-        }
-        .big-num { font-size: 2.5em; font-weight: bold; color: #2ecc71; }
-        #historial { height: 180px; overflow-y: auto; font-size: 0.85em; margin-top: 10px; border-top: 1px solid #444; padding-top: 10px; }
 
-        /* --- ADAPTACIÓN MÓVIL --- */
+        .stat-box { 
+            background: #2a2a2a; 
+            padding: 20px; 
+            border-radius: 18px; 
+            border-left: 5px solid #444; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
+
+        .big-num { font-size: 3em; font-weight: 800; line-height: 1; margin: 10px 0; }
+        
+        #historial { 
+            height: 200px; 
+            overflow-y: auto; 
+            font-size: 0.9em; 
+            padding-right: 10px;
+        }
+
+        /* Scrollbar Estilizada */
+        #historial::-webkit-scrollbar { width: 6px; }
+        #historial::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+        /* --- RESPONSIVE --- */
         @media (max-width: 1000px) {
             body { flex-direction: column; overflow-y: auto; height: auto; }
-            .side-panel { width: 100%; border-left: none; border-top: 4px solid #444; height: auto; }
-            .contenedor-principal { height: auto; padding: 10px; }
-            .nombre-zona { font-size: 12px; }
-            .led { width: 22px; height: 22px; }
+            .side-panel { width: 100%; border-left: none; }
+            .contenedor-principal { height: auto; }
         }
     </style>
 </head>
@@ -110,24 +167,24 @@
         <div class="map-container">
             <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
 
-            <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%; border:2px dashed #f39c12;" onclick="mostrarInfo('Zona Central')">
-                <span class="nombre-zona" style="color:#f39c12;">CENTRAL</span>
+            <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%;" onclick="mostrarInfo('Zona Central')">
+                <span class="nombre-zona" style="color:var(--central);">Central</span>
                 <div class="contenedor-leds">
                     <div id="led-p6" class="led led-adaptada"></div>
                     <div id="led-p7" class="led"></div>
                 </div>
             </div>
 
-            <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%; border:2px dashed #3498db;" onclick="mostrarInfo('Zona Norte')">
-                <span class="nombre-zona" style="color:#3498db;">NORTE</span>
+            <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
+                <span class="nombre-zona" style="color:var(--norte);">Norte</span>
                 <div class="contenedor-leds">
                     <div id="led-p2" class="led led-adaptada"></div>
                     <div id="led-p3" class="led"></div>
                 </div>
             </div>
 
-            <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%; border:2px dashed #e74c3c;" onclick="mostrarInfo('Zona Sur')">
-                <span class="nombre-zona" style="color:#e74c3c;">SUR</span>
+            <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
+                <span class="nombre-zona" style="color:var(--sur);">Sur</span>
                 <div class="contenedor-leds">
                     <div id="led-p4" class="led led-adaptada"></div>
                     <div id="led-p5" class="led"></div>
@@ -137,15 +194,15 @@
     </div>
 
     <div class="side-panel">
-        <div id="status-general" class="stat-box">
-            <h2 id="msg-principal" style="margin:0; font-size: 1.4em;">CONECTANDO...</h2>
+        <div id="status-general" class="stat-box" style="text-align: center;">
+            <h2 id="msg-principal" style="margin:0; letter-spacing: 1px;">SISTEMA ACTIVO</h2>
         </div>
         
         <div id="detalle-zona"></div>
         <div id="aviso-zona"></div>
         
-        <div class="stat-box" style="border-top-color: #9b59b6;">
-            <h3 style="margin:0; color:#9b59b6; font-size: 0.9em;">HISTORIAL DE ACTIVIDAD</h3>
+        <div class="stat-box" style="border-left-color: #9b59b6; flex-grow: 1;">
+            <h3 style="margin:0 0 15px 0; color:#9b59b6; font-size: 0.9em; text-transform: uppercase;">Actividad Reciente</h3>
             <div id="historial"></div>
         </div>
     </div>
@@ -156,60 +213,68 @@
         let zonaActual = "Zona Central";
 
         const CONFIG = {
-            "Zona Norte":   { totales: 41,  adaptadas: 4, pines: ['p2', 'p3'], color: "#3498db" },
-            "Zona Sur":     { totales: 27,  adaptadas: 2, pines: ['p4', 'p5'], color: "#e74c3c" },
-            "Zona Central": { totales: 189, adaptadas: 9, pines: ['p6', 'p7'], color: "#f39c12" }
+            "Zona Norte":   { id: 'zona-norte', totales: 41,  adaptadas: 4, pines: ['p2', 'p3'], color: "#3498db" },
+            "Zona Sur":     { id: 'zona-sur', totales: 27,  adaptadas: 2, pines: ['p4', 'p5'], color: "#e74c3c" },
+            "Zona Central": { id: 'zona-central', totales: 189, adaptadas: 9, pines: ['p6', 'p7'], color: "#f39c12" }
         };
 
         function mostrarInfo(nombre) {
             zonaActual = nombre;
+            
+            // Actualizar clase activa visual
+            document.querySelectorAll('.zona-interactiva').forEach(z => z.classList.remove('zona-activa', 'norte', 'central', 'sur'));
+            const zCfg = CONFIG[nombre];
+            const el = document.getElementById(zCfg.id);
+            el.classList.add('zona-activa');
+            if(nombre.includes("Norte")) el.classList.add('norte');
+            if(nombre.includes("Central")) el.classList.add('central');
+            if(nombre.includes("Sur")) el.classList.add('sur');
+
             actualizarInterfazVisual(estadosPines);
         }
 
         function actualizar() {
             fetch('/status')
                 .then(res => res.json())
-                .then(data => {
-                    actualizarInterfazVisual(data);
-                })
-                .catch(err => console.error("Error al recibir datos:", err));
+                .then(data => actualizarInterfazVisual(data))
+                .catch(err => console.error("Error:", err));
         }
 
         function actualizarInterfazVisual(data) {
             estadosPines = data;
 
-            // 1. Historial
+            // 1. Historial con iconos
             for (let pin in data) {
                 if (data[pin] !== ultimosEstados[pin]) {
-                    let accion = data[pin] === 1 ? "OCUPADA" : "LIBERADA";
+                    let accion = data[pin] === 1 ? '<span style="color:#e74c3c">OCUPADA</span>' : '<span style="color:#2ecc71">LIBERADA</span>';
                     let zonaNom = (pin === 'p2' || pin === 'p3') ? "Norte" : (pin === 'p4' || pin === 'p5') ? "Sur" : "Central";
                     let tipo = (parseInt(pin.substring(1)) % 2 === 0) ? "♿" : "🚗";
                     
                     let log = document.createElement('div');
-                    log.style.padding = "5px 0";
-                    log.style.borderBottom = "1px solid #444";
-                    log.innerHTML = `<small style="color:#888">${new Date().toLocaleTimeString('es-ES')}</small> ${tipo} <b>${zonaNom}</b> ${accion}`;
+                    log.style.padding = "8px 0";
+                    log.style.borderBottom = "1px solid #333";
+                    log.style.animation = "fadeIn 0.5s ease";
+                    log.innerHTML = `<small style="color:#666">${new Date().toLocaleTimeString()}</small> ${tipo} <b>${zonaNom}</b> ${accion}`;
                     
-                    const histDiv = document.getElementById('historial');
-                    histDiv.prepend(log);
+                    document.getElementById('historial').prepend(log);
                     ultimosEstados[pin] = data[pin];
                 }
             }
 
-            // 2. Estado General
+            // 2. Estado General (Color dinámico)
             let ocupadas = Object.values(data).reduce((a, b) => a + b, 0);
             const msgP = document.getElementById('msg-principal');
             const cajaP = document.getElementById('status-general');
             
             if (ocupadas === 6) {
                 msgP.innerText = "🚨 PARKING LLENO";
-                cajaP.style.borderColor = "#e74c3c";
+                cajaP.style.borderLeftColor = "#e74c3c";
             } else {
-                msgP.innerText = "✅ PLAZAS DISPONIBLES";
-                cajaP.style.borderColor = "#2ecc71";
+                msgP.innerText = "✅ DISPONIBLE";
+                cajaP.style.borderLeftColor = "#2ecc71";
             }
 
-            // 3. LEDs
+            // 3. LEDs Neón
             for (let i = 2; i <= 7; i++) {
                 let led = document.getElementById('led-p' + i);
                 if (led) {
@@ -218,24 +283,24 @@
                 }
             }
 
-            // 4. Panel Detalle
+            // 4. Panel Detalle Premium
             const z = zonaActual;
+            const c = CONFIG[z];
             document.getElementById('detalle-zona').innerHTML = `
-                <div class="stat-box" style="border-color: ${CONFIG[z].color}">
-                    <h3 style="margin:0; color:${CONFIG[z].color}">${z.toUpperCase()}</h3>
-                    <div style="display:flex; justify-content:space-around; align-items:center; margin-top:15px;">
+                <div class="stat-box" style="border-left-color: ${c.color}">
+                    <h3 style="margin:0; color:${c.color}; font-size:0.8em; text-transform:uppercase;">Detalle ${z}</h3>
+                    <div style="display:flex; justify-content:space-around; margin-top:15px;">
                         <div style="text-align:center;">
-                            <small>ESTÁNDAR</small><br>
-                            <span class="big-num">${CONFIG[z].totales - data[CONFIG[z].pines[1]]}</span>
+                            <small style="color:#888">ESTÁNDAR</small><br>
+                            <span class="big-num" style="color:white">${c.totales - data[c.pines[1]]}</span>
                         </div>
                         <div style="text-align:center;">
-                            <small>ADAPTADA</small><br>
-                            <span class="big-num" style="color:#3498db">${CONFIG[z].adaptadas - data[CONFIG[z].pines[0]]}</span>
+                            <small style="color:#888">ADAPTADA</small><br>
+                            <span class="big-num" style="color:#3498db">${c.adaptadas - data[c.pines[0]]}</span>
                         </div>
                     </div>
                 </div>`;
 
-            // 5. Recomendación
             gestionarRecomendacion(data);
         }
 
@@ -251,10 +316,9 @@
                     if (libres > maxLibres) { maxLibres = libres; mejorZona = z; }
                 }
                 aviso.innerHTML = `
-                    <div class="stat-box" style="border-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
-                        <b style="color:#e74c3c;">⚠️ ZONA SIN DISPONIBILIDAD</b><br>
-                        <small>Se recomienda dirigirse a:</small><br>
-                        <b style="color:#2ecc71; font-size:1.3em;">📍 ${mejorZona.toUpperCase()}</b>
+                    <div class="stat-box" style="border-left-color:#e74c3c; background:rgba(231,76,60,0.05);">
+                        <b style="color:#e74c3c;">⚠️ ZONA COMPLETA</b><br>
+                        <small>Diríjase a:</small> <b style="color:#2ecc71;">📍 ${mejorZona}</b>
                     </div>`;
             } else {
                 aviso.innerHTML = "";
