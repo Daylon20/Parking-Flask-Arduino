@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Parking - Las Vegas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
     <style>
         :root {
             --norte: #3498db; --sur: #9b59b6; --central: #f39c12;
@@ -16,63 +17,65 @@
             display: flex; flex-direction: row; height: 100vh; overflow: hidden;
         }
 
-        /* TÍTULO: A la izquierda, sin iconos y con espacio para no tapar */
+        /* TÍTULO: Tipografía Montserrat, pegado a la izquierda */
         .titulo-superior {
             position: absolute;
-            top: 20px;
-            left: 30px; /* Pegado a la izquierda con un pequeño margen */
+            top: 25px;
+            left: 30px;
             z-index: 100;
             color: white;
+            font-family: 'Montserrat', sans-serif; /* Nueva tipografía curiosa */
             font-size: 1.6em;
-            font-weight: 800;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             pointer-events: none;
+            border-left: 5px solid var(--norte); /* Un detalle visual para que se vea más profesional */
+            padding-left: 15px;
         }
 
         .contenedor-principal { 
             flex: 3; position: relative; display: flex; 
             justify-content: center; align-items: center; 
-            padding: 80px 20px 20px 20px; /* Más relleno arriba para que el título no tape el mapa */
+            padding: 40px; 
             background: #111; width: 100%;
         }
         
+        /* MAPA: Tamaño reducido para PC */
         .map-container { 
-            position: relative; background: #222; border-radius: 15px; 
-            padding: 10px; width: 100%; max-width: 1000px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid #333; margin: auto;
+            position: relative; 
+            background: #222; 
+            border-radius: 15px; 
+            padding: 10px; 
+            width: 85%;
+            max-width: 850px; 
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9); 
+            border: 1px solid #333; 
+            margin: auto;
         }
 
         .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.6; display: block; margin: 0 auto; }
 
         .led { 
-            width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; 
-            justify-content: center; font-weight: bold; font-size: 20px; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
+            width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; 
+            justify-content: center; font-weight: bold; font-size: 18px; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
         }
-        .led-off { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: #000; }
-        .led-on { background: #e74c3c; box-shadow: 0 0 15px #e74c3c; color: #fff; }
+        .led-off { background: #2ecc71; box-shadow: 0 0 12px #2ecc71; color: #000; }
+        .led-on { background: #e74c3c; box-shadow: 0 0 12px #e74c3c; color: #fff; }
 
-        /* AJUSTES PARA MÓVIL */
         @media (max-width: 1000px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
-            .contenedor-principal { padding: 70px 0 10px 0 !important; width: 100vw; height: auto; }
+            .contenedor-principal { padding: 100px 10px 20px 10px !important; width: 100vw; height: auto; }
             .side-panel { width: 100% !important; height: auto !important; border-left: none !important; }
-            .map-container { width: 95%; margin-top: 20px; }
+            .map-container { width: 95%; max-width: none; }
             .nombre-zona-mapa { font-size: 12px !important; }
-            .titulo-superior { 
-                font-size: 1.1em; 
-                top: 15px; 
-                left: 15px; 
-                position: relative; /* Cambia a relativo en móvil para que empuje el contenido */
-                width: 100%;
-                margin-bottom: 20px;
-            }
+            .titulo-superior { font-size: 1.1em; top: 15px; left: 20px; border-left-width: 3px; }
         }
 
         .zona-interactiva { 
-            position: absolute; cursor: pointer; border-radius: 15px; 
+            position: absolute; cursor: pointer; border-radius: 12px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            transition: 0.3s; border: 3px solid; 
+            transition: 0.3s; border: 2px solid; 
             background: transparent !important; 
         }
         
@@ -80,20 +83,17 @@
         #zona-central { border-color: var(--central); }
         #zona-sur { border-color: var(--sur); }
         
-        .zona-activa { 
-            box-shadow: 0 0 20px rgba(255,255,255,0.3); 
-            border-width: 6px !important; 
-        }
+        .zona-activa { box-shadow: 0 0 20px rgba(255,255,255,0.3); border-width: 5px !important; }
 
         .nombre-zona-mapa { 
-            font-weight: 800; font-size: 1.2vw; text-transform: uppercase; 
-            margin-bottom: 25px; 
+            font-weight: 800; font-size: 1.1vw; text-transform: uppercase; 
+            margin-bottom: 15px; 
             text-shadow: 2px 2px 5px rgba(0,0,0,1); 
             letter-spacing: 1px;
         }
 
         .side-panel { 
-            width: 400px; background: var(--panel-bg); padding: 25px; 
+            width: 380px; background: var(--panel-bg); padding: 25px; 
             border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh; overflow-y: auto;
         }
 
@@ -101,11 +101,11 @@
         .mini-box { background: #252525; padding: 12px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #444; cursor: pointer; transition: 0.2s; }
         .mini-box:hover { background: #333; }
 
-        .donut-chart { width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 10px auto; position: relative; }
-        .donut-chart::after { content: ''; position: absolute; width: 70px; height: 70px; background: #2a2a2a; border-radius: 50%; }
-        .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.4em; }
+        .donut-chart { width: 85px; height: 85px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 10px auto; position: relative; }
+        .donut-chart::after { content: ''; position: absolute; width: 65px; height: 65px; background: #2a2a2a; border-radius: 50%; }
+        .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.3em; }
 
-        .big-num { font-size: 3.5em; font-weight: bold; margin: 0; line-height: 1; }
+        .big-num { font-size: 3em; font-weight: bold; margin: 0; line-height: 1; }
         .rec-item { display: inline-flex; align-items: center; background: #1a1a1a; padding: 4px 8px; border-radius: 8px; margin: 0 3px; border: 1px solid #333; }
         .rec-val { font-weight: bold; color: #2ecc71; margin-right: 4px; }
     </style>
@@ -136,12 +136,12 @@
     </div>
 
     <div class="side-panel">
-        <h2 style="margin:0 0 20px 0; font-size: 1.8em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
+        <h2 style="margin:0 0 20px 0; font-size: 1.6em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
         
-        <h3 style="font-size: 0.85em; color: #666; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 1px;">Estado General</h3>
+        <h3 style="font-size: 0.8em; color: #666; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 1px;">Estado General</h3>
         <div id="otras-zonas"></div>
 
-        <h3 style="font-size: 0.85em; color: #666; text-transform: uppercase; margin: 15px 0 10px 0; letter-spacing: 1px;">Detalle Seleccionado</h3>
+        <h3 style="font-size: 0.8em; color: #666; text-transform: uppercase; margin: 15px 0 10px 0; letter-spacing: 1px;">Detalle Seleccionado</h3>
         <div id="zona-seleccionada"></div>
 
         <div id="aviso-zona"></div>
@@ -173,17 +173,14 @@
             let htmlOtras = "";
             for (let z in CONFIG) {
                 if (z === zonaActual) continue; 
-
                 let zC = CONFIG[z];
                 let lA = data[zC.pines[0]] === 0 ? "♿" : "";
                 let lB = data[zC.pines[1]] === 0 ? "🚗" : "";
-                
                 htmlOtras += `
                     <div class="mini-box" style="border-left-color: ${zC.color}" onclick="mostrarInfo('${z}')">
-                        <span style="font-weight:bold; color:#bbb;">${z}</span>
+                        <span style="font-weight:bold; color:#bbb; font-size: 0.9em;">${z}</span>
                         <div>
-                            <span style="color:#2ecc71; font-size:1.2em;">${lA} ${lB}</span>
-                            ${lA==="" && lB==="" ? '<span style="color:#e74c3c; font-size:0.8em; font-weight:bold;">COMPLETO</span>' : ''}
+                            <span style="color:#2ecc71; font-size:1.1em;">${lA} ${lB}</span>
                         </div>
                     </div>`;
             }
@@ -196,11 +193,11 @@
 
             document.getElementById('zona-seleccionada').innerHTML = `
                 <div class="stat-box" style="border-top-color: ${c.color}">
-                    <div style="text-align:center; font-size:1.5em; font-weight:bold; color:${c.color}">${zonaActual}</div>
+                    <div style="text-align:center; font-size:1.3em; font-weight:bold; color:${c.color}">${zonaActual}</div>
                     <div class="donut-chart" style="background: conic-gradient(${c.color} ${porc}%, #444 0);"><span class="donut-text">${porc}%</span></div>
                     <div style="display:flex; justify-content: space-around; text-align:center;">
-                        <div><span style="font-size:0.7em; color:#888;">LIBRE</span><br><span class="big-num">${libB}</span></div>
-                        <div><span style="font-size:0.7em; color:#888;">ADAPTADA</span><br><span class="big-num" style="color:#3498db">${libA}</span></div>
+                        <div><span style="font-size:0.65em; color:#888;">LIBRE</span><br><span class="big-num">${libB}</span></div>
+                        <div><span style="font-size:0.65em; color:#888;">ADAPTADA</span><br><span class="big-num" style="color:#3498db">${libA}</span></div>
                     </div>
                 </div>`;
             gestionarRecomendacion(data);
@@ -222,11 +219,11 @@
                 }
                 if (maxL > 0) {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
-                        <b style="color:#e74c3c; font-size:0.9em; text-transform:uppercase;">⚠️ ${zonaActual.toUpperCase()} COMPLETA</b><br>
-                        <p style="margin:10px 0 0 0; font-size:0.95em;">Le sugerimos ir a la <b>${mejor}</b>:<br><br>${hRec}</p>
+                        <b style="color:#e74c3c; font-size:0.85em; text-transform:uppercase;">⚠️ ${zonaActual.toUpperCase()} COMPLETA</b><br>
+                        <p style="margin:10px 0 0 0; font-size:0.9em;">Ir a la <b>${mejor}</b>:<br><br>${hRec}</p>
                     </div>`;
                 } else {
-                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold;">🚨 PARKING COMPLETO</div>`;
+                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold; font-size:0.9em;">🚨 PARKING COMPLETO</div>`;
                 }
             } else { aviso.innerHTML = ""; }
         }
