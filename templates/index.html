@@ -16,7 +16,7 @@
             display: flex; flex-direction: row; height: 100vh; overflow: hidden;
         }
 
-        /* --- CONTENEDOR MAPA --- */
+        /* --- LAYOUT --- */
         .contenedor-principal { 
             flex: 3; position: relative; display: flex; 
             justify-content: center; align-items: center; 
@@ -32,7 +32,7 @@
 
         .map-image { width: 100%; border-radius: 10px; opacity: 0.4; display: block; }
 
-        /* --- ICONOS (LEDS) --- */
+        /* --- ICONOS --- */
         .contenedor-leds { display: flex; gap: 10px; margin-top: 5px; }
         .led { 
             width: 40px; height: 40px; 
@@ -43,18 +43,15 @@
         .led-off { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: #000; }
         .led-on { background: #e74c3c; box-shadow: 0 0 15px #e74c3c; color: #fff; }
 
-        /* --- RESPONSIVO MÓVIL (ICONOS REAJUSTADOS) --- */
+        /* --- MOVIL --- */
         @media (max-width: 1000px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
             .contenedor-principal { padding: 10px !important; height: auto; order: 1; }
             .side-panel { width: 100% !important; border-left: none !important; padding: 25px !important; order: 2; height: auto !important; }
-            
-            /* Iconos un pelín más pequeños para que no tapen todo */
             .led { width: 45px; height: 45px; font-size: 22px; } 
             .nombre-zona { font-size: 16px !important; }
         }
 
-        /* --- ZONAS EN EL MAPA --- */
         .zona-interactiva { 
             position: absolute; cursor: pointer; border-radius: 15px; 
             display: flex; flex-direction: column; align-items: center; 
@@ -67,7 +64,7 @@
 
         .nombre-zona { font-weight: 800; font-size: 1.1vw; text-transform: uppercase; }
 
-        /* --- PANEL LATERAL --- */
+        /* --- PANEL --- */
         .side-panel { 
             width: 380px; background: var(--panel-bg); padding: 30px; 
             border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh;
@@ -78,7 +75,6 @@
             margin-bottom: 20px; border-top: 5px solid #444; 
         }
 
-        /* --- GRÁFICA --- */
         .donut-chart {
             width: 100px; height: 100px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -90,7 +86,7 @@
         }
         .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.6em; }
 
-        .titulo-grafica { text-align: center; font-size: 0.85em; color: #888; text-transform: uppercase; }
+        .titulo-grafica { text-align: center; font-size: 0.9em; color: #888; text-transform: uppercase; letter-spacing: 1px; }
         .nombre-zona-panel { text-align: center; font-size: 1.8em; font-weight: bold; margin-bottom: 5px; }
 
         .big-num { font-size: 4em; font-weight: bold; margin: 0; line-height: 1; }
@@ -169,12 +165,12 @@
             document.getElementById('detalle-zona').innerHTML = `
                 <div class="stat-box" style="border-top-color: ${c.color}">
                     <div class="nombre-zona-panel" style="color:${c.color}">${zonaActual}</div>
-                    <div class="titulo-grafica">Índice de Ocupación</div>
+                    <div class="titulo-grafica">Ocupación</div>
                     <div class="donut-chart" style="background: conic-gradient(${c.color} ${porc}%, #444 0);">
                         <span class="donut-text">${porc}%</span>
                     </div>
                     <div style="display:flex; justify-content: space-around; text-align:center; margin-top:20px;">
-                        <div><span class="label-plaza">Libre</span><br><span class="big-num">${normal}</span></div>
+                        <div><span class="label-plaza">Plaza Libre</span><br><span class="big-num">${normal}</span></div>
                         <div style="border-left: 1px solid #333; padding-left: 15px;">
                             <span class="label-plaza">Adaptada</span><br><span class="big-num" style="color:#3498db">${adaptada}</span>
                         </div>
@@ -185,20 +181,35 @@
 
         function gestionarRecomendacion(data) {
             let aviso = document.getElementById('aviso-zona');
-            if (data[CONFIG[zonaActual].pines[0]] === 1 && data[CONFIG[zonaActual].pines[1]] === 1) {
-                let mejor = ""; let max = -1;
+            let pA = CONFIG[zonaActual].pines[0], pB = CONFIG[zonaActual].pines[1];
+            
+            if (data[pA] === 1 && data[pB] === 1) {
+                let mejor = ""; let maxLibres = -1;
+                let detalleRec = "";
+
                 for (let z in CONFIG) {
                     if (z === zonaActual) continue;
-                    let libres = (data[CONFIG[z].pines[0]] === 0 ? 1:0) + (data[CONFIG[z].pines[1]] === 0 ? 1:0);
-                    if (libres > max) { max = libres; mejor = z; }
+                    let libAdaptada = data[CONFIG[z].pines[0]] === 0 ? 1 : 0;
+                    let libNormal = data[CONFIG[z].pines[1]] === 0 ? 1 : 0;
+                    let totalLibres = libAdaptada + libNormal;
+
+                    if (totalLibres > maxLibres) {
+                        maxLibres = totalLibres;
+                        mejor = z;
+                        detalleRec = (libAdaptada > 0 ? libAdaptada + " Adaptada" : "") + 
+                                     (libAdaptada > 0 && libNormal > 0 ? " + " : "") + 
+                                     (libNormal > 0 ? libNormal + " Plaza Libre" : "");
+                    }
                 }
-                if (max > 0) {
+
+                if (maxLibres > 0) {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
                         <b style="color:#e74c3c; font-size:1.2em;">⚠️ ZONA LLENA</b><br>
-                        <p style="margin:8px 0 0 0;">Le sugerimos ir a la:<br><b style="color:white;">${mejor}</b></p>
+                        <p style="margin:8px 0 0 0; font-size:0.95em;">Vaya a la <b>${mejor}</b>:<br>
+                        <span style="color:#2ecc71; font-weight:bold;">${detalleRec}</span></p>
                     </div>`;
                 } else {
-                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center;">🚨 PARKING COMPLETO</div>`;
+                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold;">🚨 PARKING COMPLETO</div>`;
                 }
             } else { aviso.innerHTML = ""; }
         }
