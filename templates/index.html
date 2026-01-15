@@ -16,7 +16,6 @@
             display: flex; flex-direction: row; height: 100vh; overflow: hidden;
         }
 
-        /* --- LAYOUT --- */
         .contenedor-principal { 
             flex: 3; position: relative; display: flex; 
             justify-content: center; align-items: center; 
@@ -32,7 +31,6 @@
 
         .map-image { width: 100%; border-radius: 10px; opacity: 0.4; display: block; }
 
-        /* --- ICONOS --- */
         .contenedor-leds { display: flex; gap: 10px; margin-top: 5px; }
         .led { 
             width: 40px; height: 40px; 
@@ -43,13 +41,11 @@
         .led-off { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: #000; }
         .led-on { background: #e74c3c; box-shadow: 0 0 15px #e74c3c; color: #fff; }
 
-        /* --- MOVIL --- */
         @media (max-width: 1000px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
             .contenedor-principal { padding: 10px !important; height: auto; order: 1; }
             .side-panel { width: 100% !important; border-left: none !important; padding: 25px !important; order: 2; height: auto !important; }
             .led { width: 45px; height: 45px; font-size: 22px; } 
-            .nombre-zona { font-size: 16px !important; }
         }
 
         .zona-interactiva { 
@@ -64,7 +60,6 @@
 
         .nombre-zona { font-weight: 800; font-size: 1.1vw; text-transform: uppercase; }
 
-        /* --- PANEL --- */
         .side-panel { 
             width: 380px; background: var(--panel-bg); padding: 30px; 
             border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh;
@@ -86,11 +81,15 @@
         }
         .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.6em; }
 
-        .titulo-grafica { text-align: center; font-size: 0.9em; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .titulo-grafica { text-align: center; font-size: 0.85em; color: #888; text-transform: uppercase; }
         .nombre-zona-panel { text-align: center; font-size: 1.8em; font-weight: bold; margin-bottom: 5px; }
 
         .big-num { font-size: 4em; font-weight: bold; margin: 0; line-height: 1; }
         .label-plaza { color: #888; font-size: 0.8em; text-transform: uppercase; font-weight: bold; display: block; }
+
+        /* Estilo para los iconos de recomendación */
+        .rec-item { display: inline-flex; align-items: center; background: #1a1a1a; padding: 4px 10px; border-radius: 8px; margin: 0 4px; border: 1px solid #333; }
+        .rec-val { font-weight: bold; color: #2ecc71; margin-right: 5px; font-size: 1.1em; }
     </style>
 </head>
 <body onload="mostrarInfo('Zona Central')">
@@ -126,7 +125,7 @@
     </div>
 
     <div class="side-panel">
-        <h2 style="margin:0 0 25px 0; font-size: 2em; text-align: center;">Ociopia <span style="color:#666; font-weight:300;">Parking</span></h2>
+        <h2 style="margin:0 0 25px 0; font-size: 2em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
         <div id="detalle-zona"></div>
         <div id="aviso-zona"></div>
         <div style="flex-grow: 1;"></div>
@@ -185,7 +184,7 @@
             
             if (data[pA] === 1 && data[pB] === 1) {
                 let mejor = ""; let maxLibres = -1;
-                let detalleRec = "";
+                let htmlRec = "";
 
                 for (let z in CONFIG) {
                     if (z === zonaActual) continue;
@@ -196,17 +195,17 @@
                     if (totalLibres > maxLibres) {
                         maxLibres = totalLibres;
                         mejor = z;
-                        detalleRec = (libAdaptada > 0 ? libAdaptada + " Adaptada" : "") + 
-                                     (libAdaptada > 0 && libNormal > 0 ? " + " : "") + 
-                                     (libNormal > 0 ? libNormal + " Plaza Libre" : "");
+                        htmlRec = "";
+                        if(libAdaptada > 0) htmlRec += `<span class="rec-item"><span class="rec-val">${libAdaptada}</span>♿</span>`;
+                        if(libNormal > 0) htmlRec += `<span class="rec-item"><span class="rec-val">${libNormal}</span>🚗</span>`;
                     }
                 }
 
                 if (maxLibres > 0) {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
-                        <b style="color:#e74c3c; font-size:1.2em;">⚠️ ZONA LLENA</b><br>
-                        <p style="margin:8px 0 0 0; font-size:0.95em;">Vaya a la <b>${mejor}</b>:<br>
-                        <span style="color:#2ecc71; font-weight:bold;">${detalleRec}</span></p>
+                        <b style="color:#e74c3c; font-size:1.1em; text-transform:uppercase;">⚠️ PARKING ${zonaActual.split(' ')[1].toUpperCase()} COMPLETO</b><br>
+                        <p style="margin:12px 0 0 0; font-size:0.95em;">Le sugerimos ir a la <b>${mejor}</b>:<br><br>
+                        ${htmlRec}</p>
                     </div>`;
                 } else {
                     aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold;">🚨 PARKING COMPLETO</div>`;
