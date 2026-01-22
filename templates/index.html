@@ -3,319 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS PARKING - Dashboard Profesional</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <title>Smart Parking - Las Vegas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
     <style>
-        /* VARIABLES DE COLOR ORIGINALES */
         :root {
-            --primary-blue: #3498db;
-            --dark-bg: #0a0a0b;
-            --panel-bg: #161618;
-            --card-bg: #1f1f23;
-            --text-main: #ffffff;
-            --text-dim: #a0a0a0;
-            --success: #2ecc71;
-            --danger: #e74c3c;
-            --warning: #f1c40f;
+            --norte: #3498db; --sur: #9b59b6; --central: #f39c12;
+            --bg-dark: #121212; --panel-bg: #1e1e1e;
         }
 
-        body {
-            margin: 0;
-            padding: 0;
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background-color: var(--bg-dark); color: white; margin: 0; 
+            display: flex; flex-direction: row; height: 100vh; overflow: hidden;
+        }
+
+        /* TÍTULO: Montserrat, pegado a la izquierda */
+        .titulo-superior {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            z-index: 100;
+            color: white;
             font-family: 'Montserrat', sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-main);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* BARRA LATERAL IZQUIERDA (ESTRUCTURA ORIGINAL) */
-        .sidebar {
-            width: 320px;
-            background-color: var(--panel-bg);
-            border-right: 1px solid #2a2a2e;
-            display: flex;
-            flex-direction: column;
-            padding: 30px 20px;
-            box-sizing: border-box;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 50px;
-        }
-
-        .sidebar-p-logo {
-            background-color: var(--primary-blue);
-            color: white;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
+            font-size: 1.6em;
             font-weight: 900;
-            font-size: 26px;
-        }
-
-        .sidebar-brand-text {
-            font-weight: 700;
-            font-size: 1.3rem;
-            letter-spacing: 0.5px;
-        }
-
-        .menu-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            margin-bottom: 8px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-dim);
-            font-weight: 600;
-        }
-
-        .menu-item:hover, .menu-item.active {
-            background-color: rgba(52, 152, 219, 0.1);
-            color: var(--primary-blue);
-        }
-
-        .status-panel {
-            margin-top: auto;
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid #2a2a2e;
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            margin-top: 10px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--warning);
-        }
-
-        /* CONTENIDO PRINCIPAL (DERECHA) */
-        .main-view {
-            flex-grow: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-y: auto;
-        }
-
-        /* EL TÍTULO QUE ME HAS PEDIDO LITERALMENTE */
-        .header-section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 25px;
-            margin-bottom: 40px;
-            width: 100%;
-        }
-
-        .big-p-logo {
-            background-color: var(--primary-blue);
-            color: white;
-            width: 65px;
-            height: 65px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            font-weight: 900;
-            font-size: 40px;
-            box-shadow: 0 0 25px rgba(52, 152, 219, 0.4);
-        }
-
-        .big-title {
-            font-weight: 900;
-            font-size: 2.4rem;
-            margin: 0;
             text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+            border-left: 5px solid var(--norte);
+            padding-left: 15px;
+        }
+
+        .contenedor-principal { 
+            flex: 3; position: relative; display: flex; 
+            justify-content: center; align-items: center; 
+            padding: 40px; 
+            background: #111; width: 100%;
+        }
+        
+        /* MAPA: Bajado con margin-top */
+        .map-container { 
+            position: relative; 
+            background: #222; 
+            border-radius: 15px; 
+            padding: 10px; 
+            width: 85%;
+            max-width: 850px; 
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9); 
+            border: 1px solid #333; 
+            margin: 60px auto 0 auto; /* Posición ajustada */
+        }
+
+        .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.6; display: block; margin: 0 auto; }
+
+        .led { 
+            width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; 
+            justify-content: center; font-weight: bold; font-size: 18px; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
+        }
+        .led-off { background: #2ecc71; box-shadow: 0 0 12px #2ecc71; color: #000; }
+        .led-on { background: #e74c3c; box-shadow: 0 0 12px #e74c3c; color: #fff; }
+
+        @media (max-width: 1000px) {
+            body { flex-direction: column; height: auto; overflow-y: auto; }
+            .contenedor-principal { padding: 100px 10px 20px 10px !important; width: 100vw; height: auto; }
+            .side-panel { width: 100% !important; height: auto !important; border-left: none !important; }
+            .map-container { width: 95%; max-width: none; margin-top: 20px; }
+            .nombre-zona-mapa { font-size: 12px !important; }
+            .titulo-superior { font-size: 1.1em; top: 15px; left: 20px; border-left-width: 3px; }
+        }
+
+        .zona-interactiva { 
+            position: absolute; cursor: pointer; border-radius: 12px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: 0.3s; border: 2px solid; 
+            background: transparent !important; 
+        }
+        
+        #zona-norte { border-color: var(--norte); }
+        #zona-central { border-color: var(--central); }
+        #zona-sur { border-color: var(--sur); }
+        
+        .zona-activa { box-shadow: 0 0 20px rgba(255,255,255,0.3); border-width: 5px !important; }
+
+        .nombre-zona-mapa { 
+            font-weight: 800; font-size: 1.1vw; text-transform: uppercase; 
+            margin-bottom: 15px; 
+            text-shadow: 2px 2px 5px rgba(0,0,0,1); 
             letter-spacing: 1px;
         }
 
-        /* CONTENEDOR DE TU IMAGEN logo_parking.jpg */
-        .parking-container {
-            position: relative;
-            width: 950px;
-            height: 550px;
-            background: url('/static/img/logo_parking.jpg') no-repeat center center;
-            background-size: contain;
-            background-color: #000;
-            border-radius: 25px;
-            border: 5px solid #1f1f23;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        .side-panel { 
+            width: 380px; background: var(--panel-bg); padding: 25px; 
+            border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh; overflow-y: auto;
         }
 
-        /* LAS PLAZAS (CÍRCULOS) */
-        .slot {
-            position: absolute;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 3px solid #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
+        .stat-box { background: #2a2a2a; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-top: 5px solid #444; }
+        .mini-box { background: #252525; padding: 12px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #444; cursor: pointer; transition: 0.2s; }
+        .mini-box:hover { background: #333; }
 
-        .slot.free {
-            background-color: var(--success);
-            box-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
-        }
+        .donut-chart { width: 85px; height: 85px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 10px auto; position: relative; }
+        .donut-chart::after { content: ''; position: absolute; width: 65px; height: 65px; background: #2a2a2a; border-radius: 50%; }
+        .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.3em; }
 
-        .slot.occupied {
-            background-color: var(--danger);
-            box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
-            transform: scale(1.15);
-        }
-
-        /* COORDENADAS (COMO ANTES, AJUSTALAS SI ES NECESARIO) */
-        #p2 { top: 120px; left: 180px; }
-        #p3 { top: 120px; left: 330px; }
-        #p4 { top: 120px; left: 480px; }
-        #p5 { top: 380px; left: 180px; }
-        #p6 { top: 380px; left: 330px; }
-        #p7 { top: 380px; left: 480px; }
-
-        .btn-logout {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: rgba(231, 76, 60, 0.1);
-            color: var(--danger);
-            text-decoration: none;
-            text-align: center;
-            border-radius: 12px;
-            border: 1px solid var(--danger);
-            font-weight: 700;
-            transition: 0.3s;
-        }
-
-        .btn-logout:hover {
-            background-color: var(--danger);
-            color: white;
-        }
-
+        .big-num { font-size: 3em; font-weight: bold; margin: 0; line-height: 1; }
+        .rec-item { display: inline-flex; align-items: center; background: #1a1a1a; padding: 4px 8px; border-radius: 8px; margin: 0 3px; border: 1px solid #333; }
+        .rec-val { font-weight: bold; color: #2ecc71; margin-right: 4px; }
     </style>
 </head>
-<body>
+<body onload="mostrarInfo('Zona Central')">
 
-    <div class="sidebar">
-        <div class="sidebar-brand">
-            <div class="sidebar-p-logo">P</div>
-            <div class="sidebar-brand-text">NEXUS PANEL</div>
-        </div>
+    <div class="titulo-superior">PARKING CENTRO COMERCIAL LAS VEGAS</div>
 
-        <div class="menu-list">
-            <div class="menu-item active"><span>🏠</span> Vista General</div>
-            <div class="menu-item"><span>📊</span> Estadísticas</div>
-            <div class="menu-item"><span>🛡️</span> Seguridad</div>
-            <div class="menu-item"><span>⚙️</span> Ajustes</div>
-        </div>
-
-        <div class="status-panel">
-            <h5 style="margin:0; color:var(--text-dim)">CONECTIVIDAD</h5>
-            <div class="status-indicator">
-                <div class="dot" id="server-dot" style="background-color: var(--success);"></div>
-                <span>Servidor Cloud: Activo</span>
+    <div class="contenedor-principal">
+        <div class="map-container">
+            <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
+            
+            <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%;" onclick="mostrarInfo('Zona Central')">
+                <span class="nombre-zona-mapa" style="color:var(--central);">Zona Central</span>
+                <div style="display:flex; gap:10px;"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
             </div>
-            <div class="status-indicator">
-                <div class="dot" id="arduino-dot"></div>
-                <span>Arduino: <span id="arduino-text">Buscando...</span></span>
+            
+            <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
+                <span class="nombre-zona-mapa" style="color:var(--norte);">Zona Norte</span>
+                <div style="display:flex; gap:10px;"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
+            </div>
+            
+            <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
+                <span class="nombre-zona-mapa" style="color:var(--sur);">Zona Sur</span>
+                <div style="display:flex; gap:10px;"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
             </div>
         </div>
-
-        <a href="/logout" class="btn-logout">CERRAR SESIÓN</a>
     </div>
 
-    <div class="main-view">
+    <div class="side-panel">
+        <h2 style="margin:0 0 20px 0; font-size: 1.6em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
         
-        <div class="header-section">
-            <div class="big-p-logo">P</div>
-            <h1 class="big-title">
-                PARKING CENTRO COMERCIAL <span style="color: var(--primary-blue);">NEXUS</span>
-            </h1>
-        </div>
+        <h3 style="font-size: 0.8em; color: #666; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 1px;">Estado General</h3>
+        <div id="otras-zonas"></div>
 
-        <div class="parking-container">
-            <div id="p2" class="slot free">2</div>
-            <div id="p3" class="slot free">3</div>
-            <div id="p4" class="slot free">4</div>
-            <div id="p5" class="slot free">5</div>
-            <div id="p6" class="slot free">6</div>
-            <div id="p7" class="slot free">7</div>
-        </div>
+        <h3 style="font-size: 0.8em; color: #666; text-transform: uppercase; margin: 15px 0 10px 0; letter-spacing: 1px;">Detalle Seleccionado</h3>
+        <div id="zona-seleccionada"></div>
 
-        <div style="margin-top: 40px; display: flex; gap: 40px; background: var(--panel-bg); padding: 15px 30px; border-radius: 20px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 15px; height: 15px; background: var(--success); border-radius: 3px;"></div>
-                <span style="font-weight: 600;">LIBRE</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 15px; height: 15px; background: var(--danger); border-radius: 3px;"></div>
-                <span style="font-weight: 600;">OCUPADO</span>
-            </div>
-        </div>
+        <div id="aviso-zona"></div>
     </div>
 
     <script>
-        async function fetchStatus() {
-            try {
-                const response = await fetch('/status');
-                const data = await response.json();
-                
-                // Actualizar luces del panel lateral
-                document.getElementById('arduino-dot').style.background = '#2ecc71';
-                document.getElementById('arduino-text').innerText = 'Conectado';
+        let estadosPines = { p2:0, p3:0, p4:0, p5:0, p6:0, p7:0 };
+        let zonaActual = "Zona Central";
+        const CONFIG = {
+            "Zona Norte":   { id: 'zona-norte', pines: ['p2', 'p3'], color: "#3498db" },
+            "Zona Sur":     { id: 'zona-sur', pines: ['p4', 'p5'], color: "#9b59b6" },
+            "Zona Central": { id: 'zona-central', pines: ['p6', 'p7'], color: "#f39c12" }
+        };
 
-                // Actualizar cada plaza
-                for (let key in data) {
-                    const slotElement = document.getElementById(key);
-                    if (slotElement) {
-                        if (data[key] === 1) {
-                            slotElement.classList.remove('free');
-                            slotElement.classList.add('occupied');
-                        } else {
-                            slotElement.classList.remove('occupied');
-                            slotElement.classList.add('free');
-                        }
-                    }
-                }
-            } catch (error) {
-                document.getElementById('arduino-dot').style.background = '#e74c3c';
-                document.getElementById('arduino-text').innerText = 'Error';
-            }
+        function mostrarInfo(nombre) {
+            zonaActual = nombre;
+            document.querySelectorAll('.zona-interactiva').forEach(z => z.classList.remove('zona-activa'));
+            document.getElementById(CONFIG[nombre].id).classList.add('zona-activa');
+            actualizarInterfaz(estadosPines);
         }
 
-        // Llamada cada 2 segundos
-        setInterval(fetchStatus, 2000);
-        fetchStatus();
+        function actualizarInterfaz(data) {
+            estadosPines = data;
+            for (let pin in data) {
+                let led = document.getElementById('led-' + pin);
+                if (led) led.className = data[pin] === 1 ? 'led led-on' : 'led led-off';
+            }
+
+            let htmlOtras = "";
+            for (let z in CONFIG) {
+                if (z === zonaActual) continue; 
+                let zC = CONFIG[z];
+                let lA = data[zC.pines[0]] === 0 ? "♿" : "";
+                let lB = data[zC.pines[1]] === 0 ? "🚗" : "";
+                htmlOtras += `
+                    <div class="mini-box" style="border-left-color: ${zC.color}" onclick="mostrarInfo('${z}')">
+                        <span style="font-weight:bold; color:#bbb; font-size: 0.9em;">${z}</span>
+                        <div>
+                            <span style="color:#2ecc71; font-size:1.1em;">${lA} ${lB}</span>
+                        </div>
+                    </div>`;
+            }
+            document.getElementById('otras-zonas').innerHTML = htmlOtras;
+
+            const c = CONFIG[zonaActual];
+            const libA = data[c.pines[0]] === 0 ? 1 : 0;
+            const libB = data[c.pines[1]] === 0 ? 1 : 0;
+            const porc = (( (data[c.pines[0]] === 1 ? 1:0) + (data[c.pines[1]] === 1 ? 1:0) ) / 2) * 100;
+
+            document.getElementById('zona-seleccionada').innerHTML = `
+                <div class="stat-box" style="border-top-color: ${c.color}">
+                    <div style="text-align:center; font-size:1.3em; font-weight:bold; color:${c.color}; margin-bottom: 5px;">${zonaActual}</div>
+                    
+                    <div style="text-align:center; font-size:0.7em; color:#888; text-transform:uppercase; letter-spacing:1px;">Ocupación</div>
+                    
+                    <div class="donut-chart" style="background: conic-gradient(${c.color} ${porc}%, #444 0);">
+                        <span class="donut-text">${porc}%</span>
+                    </div>
+                    
+                    <div style="display:flex; justify-content: space-around; text-align:center;">
+                        <div><span style="font-size:0.65em; color:#888;">LIBRE</span><br><span class="big-num">${libB}</span></div>
+                        <div><span style="font-size:0.65em; color:#888;">ADAPTADA</span><br><span class="big-num" style="color:#3498db">${libA}</span></div>
+                    </div>
+                </div>`;
+            gestionarRecomendacion(data);
+        }
+
+        function gestionarRecomendacion(data) {
+            let aviso = document.getElementById('aviso-zona');
+            if (data[CONFIG[zonaActual].pines[0]] === 1 && data[CONFIG[zonaActual].pines[1]] === 1) {
+                let mejor = ""; let maxL = -1; let hRec = "";
+                for (let z in CONFIG) {
+                    if (z === zonaActual) continue;
+                    let a = data[CONFIG[z].pines[0]] === 0 ? 1 : 0;
+                    let b = data[CONFIG[z].pines[1]] === 0 ? 1 : 0;
+                    if ((a+b) > maxL) {
+                        maxL = a+b; mejor = z;
+                        hRec = (a > 0 ? `<span class="rec-item"><span class="rec-val">${a}</span>♿</span>` : "") +
+                               (b > 0 ? `<span class="rec-item"><span class="rec-val">${b}</span>🚗</span>` : "");
+                    }
+                }
+                if (maxL > 0) {
+                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
+                        <b style="color:#e74c3c; font-size:0.85em; text-transform:uppercase;">⚠️ ${zonaActual.toUpperCase()} COMPLETA</b><br>
+                        <p style="margin:10px 0 0 0; font-size:0.9em;">Se recomienda ir a la <b>${mejor}</b>:<br><br>${hRec}</p>
+                    </div>`;
+                } else {
+                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold; font-size:0.9em;">🚨 PARKING COMPLETO</div>`;
+                }
+            } else { aviso.innerHTML = ""; }
+        }
+
+        function refrescar() { 
+            fetch('/status').then(r => r.json()).then(d => actualizarInterfaz(d)).catch(() => {}); 
+        }
+        setInterval(refrescar, 2000);
     </script>
 </body>
 </html>
