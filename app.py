@@ -69,7 +69,7 @@ def logout():
 @app.route('/')
 @login_required  # Si no están logueados, los manda al login automáticamente
 def index():
-    return render_template('parking.html') # Este es tu HTML del parking
+    return render_template('index.html') # Este es tu HTML del parking
 
 # Ruta para que tu JS siga funcionando
 @app.route('/status')
@@ -82,3 +82,4 @@ def status():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
