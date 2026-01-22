@@ -37,36 +37,43 @@
             padding: 20px; background: #111;
         }
         
+        /* MAPA MÁS GRANDE */
         .map-container { 
             position: relative; background: #222; border-radius: 15px; 
-            width: 90%; max-width: 800px; box-shadow: 0 10px 50px rgba(0,0,0,0.9); 
-            border: 1px solid #333; margin-top: 50px;
+            width: 95%; max-width: 1000px; /* Aumentado de 800px a 1000px */
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9); 
+            border: 1px solid #333; margin-top: 60px;
         }
 
         .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.5; display: block; }
 
-        /* PANEL LATERAL CON SCROLL CORREGIDO */
+        /* PANEL LATERAL CON BOTÓN AL FONDO */
         .side-panel { 
             width: 380px; background: var(--panel-bg); padding: 25px; 
             border-left: 1px solid #444; display: flex; flex-direction: column; 
-            height: 100vh; overflow-y: auto; box-sizing: border-box;
+            height: 100vh; box-sizing: border-box;
         }
 
-        /* AJUSTES PARA MÓVIL */
+        .contenido-panel {
+            flex-grow: 1; overflow-y: auto; /* Para que solo esta parte haga scroll */
+        }
+
         @media (max-width: 1000px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
-            .side-panel { width: 100%; height: auto; border-left: none; border-top: 1px solid #444; }
-            .titulo-superior { font-size: 1em; top: 15px; left: 15px; position: relative; margin-bottom: 20px; }
-            .contenedor-principal { padding: 10px; }
-            .map-container { width: 95%; margin-top: 10px; }
+            .side-panel { width: 100%; height: auto; border-left: none; }
+            .map-container { width: 95%; max-width: none; }
         }
 
-        .led { width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.3s; }
+        .led { width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .led-off { background: #2ecc71; color: #000; box-shadow: 0 0 10px #2ecc71; }
         .led-on { background: #e74c3c; color: #fff; box-shadow: 0 0 10px #e74c3c; }
 
-        .zona-interactiva { position: absolute; cursor: pointer; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid; }
-        .zona-activa { box-shadow: 0 0 20px rgba(255,255,255,0.2); border-width: 4px !important; }
+        /* BORDES DINÁMICOS POR ZONA */
+        .zona-interactiva { position: absolute; cursor: pointer; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid; transition: 0.3s; }
+        
+        #zona-norte.zona-activa { box-shadow: 0 0 20px var(--norte); border-color: var(--norte); border-width: 4px; }
+        #zona-sur.zona-activa { box-shadow: 0 0 20px var(--sur); border-color: var(--sur); border-width: 4px; }
+        #zona-central.zona-activa { box-shadow: 0 0 20px var(--central); border-color: var(--central); border-width: 4px; }
 
         .stat-box { background: #2a2a2a; padding: 15px; border-radius: 15px; margin-bottom: 12px; border-top: 4px solid #444; }
         .mini-box { background: #252525; padding: 10px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #444; cursor: pointer; }
@@ -76,9 +83,11 @@
         .donut-text { position: relative; z-index: 1; font-weight: bold; }
 
         .btn-logout {
-            margin-top: 20px; padding: 12px; background: rgba(231, 76, 60, 0.2); color: #e74c3c; 
-            text-align: center; text-decoration: none; border-radius: 10px; font-weight: bold; border: 1px solid #e74c3c;
+            margin-top: 20px; padding: 15px; background: #3d1a1a; color: #e74c3c; 
+            text-align: center; text-decoration: none; border-radius: 10px; 
+            font-weight: bold; border: 1px solid #e74c3c; transition: 0.3s;
         }
+        .btn-logout:hover { background: #e74c3c; color: white; }
     </style>
 </head>
 <body onload="mostrarInfo('Zona Central')">
@@ -92,17 +101,17 @@
         <div class="map-container">
             <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
             
-            <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%;" onclick="mostrarInfo('Zona Central')">
+            <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%; border-color: var(--central);" onclick="mostrarInfo('Zona Central')">
                 <span style="font-size:0.8em; color:var(--central); font-weight:bold; margin-bottom:5px;">ZONA CENTRAL</span>
                 <div style="display:flex; gap:8px;"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
             </div>
             
-            <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
+            <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%; border-color: var(--norte);" onclick="mostrarInfo('Zona Norte')">
                 <span style="font-size:0.8em; color:var(--norte); font-weight:bold; margin-bottom:5px;">ZONA NORTE</span>
                 <div style="display:flex; gap:8px;"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
             </div>
             
-            <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
+            <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%; border-color: var(--sur);" onclick="mostrarInfo('Zona Sur')">
                 <span style="font-size:0.8em; color:var(--sur); font-weight:bold; margin-bottom:5px;">ZONA SUR</span>
                 <div style="display:flex; gap:8px;"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
             </div>
@@ -110,15 +119,17 @@
     </div>
 
     <div class="side-panel">
-        <h2 style="margin:0 0 20px 0; font-size: 1.4em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
-        
-        <h3 style="font-size: 0.7em; color: #888; text-transform: uppercase; margin-bottom: 10px;">Zonas Disponibles</h3>
-        <div id="otras-zonas"></div>
+        <div class="contenido-panel">
+            <h2 style="margin:0 0 20px 0; font-size: 1.4em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
+            
+            <h3 style="font-size: 0.7em; color: #888; text-transform: uppercase; margin-bottom: 10px;">Zonas Disponibles</h3>
+            <div id="otras-zonas"></div>
 
-        <h3 style="font-size: 0.7em; color: #888; text-transform: uppercase; margin: 15px 0 10px 0;">Detalle de Ocupación</h3>
-        <div id="zona-seleccionada"></div>
+            <h3 style="font-size: 0.7em; color: #888; text-transform: uppercase; margin: 15px 0 10px 0;">Detalle de Ocupación</h3>
+            <div id="zona-seleccionada"></div>
 
-        <div id="aviso-zona"></div>
+            <div id="aviso-zona"></div>
+        </div>
 
         <a href="/logout" class="btn-logout">CERRAR SESIÓN</a>
     </div>
