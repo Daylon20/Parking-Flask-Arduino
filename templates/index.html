@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Parking - Las Vegas</title>
+    <title>NEXUS PARKING - Sistema Inteligente</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,7 +17,7 @@
             display: flex; flex-direction: row; height: 100vh; overflow: hidden;
         }
 
-        /* TÍTULO: Montserrat, pegado a la izquierda */
+        /* TÍTULO ACTUALIZADO: NEXUS CON LOGO P */
         .titulo-superior {
             position: absolute;
             top: 25px;
@@ -30,8 +30,22 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             pointer-events: none;
-            border-left: 5px solid var(--norte);
-            padding-left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-p-cuadrado {
+            background-color: var(--norte);
+            color: white;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.9em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .contenedor-principal { 
@@ -41,7 +55,7 @@
             background: #111; width: 100%;
         }
         
-        /* MAPA: Bajado con margin-top */
+        /* MAPA: Imagen logo_parking.jpg */
         .map-container { 
             position: relative; 
             background: #222; 
@@ -51,7 +65,7 @@
             max-width: 850px; 
             box-shadow: 0 10px 50px rgba(0,0,0,0.9); 
             border: 1px solid #333; 
-            margin: 60px auto 0 auto; /* Posición ajustada */
+            margin: 60px auto 0 auto;
         }
 
         .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.6; display: block; margin: 0 auto; }
@@ -62,15 +76,6 @@
         }
         .led-off { background: #2ecc71; box-shadow: 0 0 12px #2ecc71; color: #000; }
         .led-on { background: #e74c3c; box-shadow: 0 0 12px #e74c3c; color: #fff; }
-
-        @media (max-width: 1000px) {
-            body { flex-direction: column; height: auto; overflow-y: auto; }
-            .contenedor-principal { padding: 100px 10px 20px 10px !important; width: 100vw; height: auto; }
-            .side-panel { width: 100% !important; height: auto !important; border-left: none !important; }
-            .map-container { width: 95%; max-width: none; margin-top: 20px; }
-            .nombre-zona-mapa { font-size: 12px !important; }
-            .titulo-superior { font-size: 1.1em; top: 15px; left: 20px; border-left-width: 3px; }
-        }
 
         .zona-interactiva { 
             position: absolute; cursor: pointer; border-radius: 12px; 
@@ -108,11 +113,19 @@
         .big-num { font-size: 3em; font-weight: bold; margin: 0; line-height: 1; }
         .rec-item { display: inline-flex; align-items: center; background: #1a1a1a; padding: 4px 8px; border-radius: 8px; margin: 0 3px; border: 1px solid #333; }
         .rec-val { font-weight: bold; color: #2ecc71; margin-right: 4px; }
+        
+        .btn-logout {
+            margin-top: auto; padding: 12px; background: #e74c3c; color: white; 
+            text-align: center; text-decoration: none; border-radius: 10px; font-weight: bold;
+        }
     </style>
 </head>
 <body onload="mostrarInfo('Zona Central')">
 
-    <div class="titulo-superior">PARKING CENTRO COMERCIAL LAS VEGAS</div>
+    <div class="titulo-superior">
+        <div class="logo-p-cuadrado">P</div>
+        PARKING CENTRO COMERCIAL <span style="color:var(--norte)">NEXUS</span>
+    </div>
 
     <div class="contenedor-principal">
         <div class="map-container">
@@ -136,7 +149,7 @@
     </div>
 
     <div class="side-panel">
-        <h2 style="margin:0 0 20px 0; font-size: 1.6em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
+        <h2 style="margin:0 0 20px 0; font-size: 1.6em; text-align: center;">Nexus <span style="color:var(--norte); font-weight:300;">Smart</span></h2>
         
         <h3 style="font-size: 0.8em; color: #666; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 1px;">Estado General</h3>
         <div id="otras-zonas"></div>
@@ -145,6 +158,8 @@
         <div id="zona-seleccionada"></div>
 
         <div id="aviso-zona"></div>
+
+        <a href="/logout" class="btn-logout">CERRAR SESIÓN</a>
     </div>
 
     <script>
@@ -194,13 +209,10 @@
             document.getElementById('zona-seleccionada').innerHTML = `
                 <div class="stat-box" style="border-top-color: ${c.color}">
                     <div style="text-align:center; font-size:1.3em; font-weight:bold; color:${c.color}; margin-bottom: 5px;">${zonaActual}</div>
-                    
                     <div style="text-align:center; font-size:0.7em; color:#888; text-transform:uppercase; letter-spacing:1px;">Ocupación</div>
-                    
                     <div class="donut-chart" style="background: conic-gradient(${c.color} ${porc}%, #444 0);">
                         <span class="donut-text">${porc}%</span>
                     </div>
-                    
                     <div style="display:flex; justify-content: space-around; text-align:center;">
                         <div><span style="font-size:0.65em; color:#888;">LIBRE</span><br><span class="big-num">${libB}</span></div>
                         <div><span style="font-size:0.65em; color:#888;">ADAPTADA</span><br><span class="big-num" style="color:#3498db">${libA}</span></div>
