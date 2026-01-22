@@ -17,106 +17,67 @@
             display: flex; flex-direction: row; height: 100vh; overflow: hidden;
         }
 
-        /* TÍTULO ACTUALIZADO: NEXUS CON LOGO P */
+        /* TÍTULO SUPERIOR */
         .titulo-superior {
-            position: absolute;
-            top: 25px;
-            left: 30px;
-            z-index: 100;
-            color: white;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.6em;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            position: absolute; top: 25px; left: 30px; z-index: 100;
+            color: white; font-family: 'Montserrat', sans-serif;
+            font-size: 1.4em; font-weight: 900; text-transform: uppercase;
+            display: flex; align-items: center; gap: 15px;
         }
 
         .logo-p-cuadrado {
-            background-color: var(--norte);
-            color: white;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-size: 0.9em;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background-color: var(--norte); color: white; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; font-size: 0.9em;
         }
 
         .contenedor-principal { 
             flex: 3; position: relative; display: flex; 
             justify-content: center; align-items: center; 
-            padding: 40px; 
-            background: #111; width: 100%;
+            padding: 20px; background: #111;
         }
         
-        /* MAPA: Imagen logo_parking.jpg */
         .map-container { 
-            position: relative; 
-            background: #222; 
-            border-radius: 15px; 
-            padding: 10px; 
-            width: 85%;
-            max-width: 850px; 
-            box-shadow: 0 10px 50px rgba(0,0,0,0.9); 
-            border: 1px solid #333; 
-            margin: 60px auto 0 auto;
+            position: relative; background: #222; border-radius: 15px; 
+            width: 90%; max-width: 800px; box-shadow: 0 10px 50px rgba(0,0,0,0.9); 
+            border: 1px solid #333; margin-top: 50px;
         }
 
-        .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.6; display: block; margin: 0 auto; }
+        .map-image { width: 100%; height: auto; border-radius: 10px; opacity: 0.5; display: block; }
 
-        .led { 
-            width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; 
-            justify-content: center; font-weight: bold; font-size: 18px; transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
-        }
-        .led-off { background: #2ecc71; box-shadow: 0 0 12px #2ecc71; color: #000; }
-        .led-on { background: #e74c3c; box-shadow: 0 0 12px #e74c3c; color: #fff; }
-
-        .zona-interactiva { 
-            position: absolute; cursor: pointer; border-radius: 12px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            transition: 0.3s; border: 2px solid; 
-            background: transparent !important; 
-        }
-        
-        #zona-norte { border-color: var(--norte); }
-        #zona-central { border-color: var(--central); }
-        #zona-sur { border-color: var(--sur); }
-        
-        .zona-activa { box-shadow: 0 0 20px rgba(255,255,255,0.3); border-width: 5px !important; }
-
-        .nombre-zona-mapa { 
-            font-weight: 800; font-size: 1.1vw; text-transform: uppercase; 
-            margin-bottom: 15px; 
-            text-shadow: 2px 2px 5px rgba(0,0,0,1); 
-            letter-spacing: 1px;
-        }
-
+        /* PANEL LATERAL CON SCROLL CORREGIDO */
         .side-panel { 
             width: 380px; background: var(--panel-bg); padding: 25px; 
-            border-left: 1px solid #444; display: flex; flex-direction: column; height: 100vh; overflow-y: auto;
+            border-left: 1px solid #444; display: flex; flex-direction: column; 
+            height: 100vh; overflow-y: auto; box-sizing: border-box;
         }
 
-        .stat-box { background: #2a2a2a; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-top: 5px solid #444; }
-        .mini-box { background: #252525; padding: 12px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #444; cursor: pointer; transition: 0.2s; }
-        .mini-box:hover { background: #333; }
+        /* AJUSTES PARA MÓVIL */
+        @media (max-width: 1000px) {
+            body { flex-direction: column; height: auto; overflow-y: auto; }
+            .side-panel { width: 100%; height: auto; border-left: none; border-top: 1px solid #444; }
+            .titulo-superior { font-size: 1em; top: 15px; left: 15px; position: relative; margin-bottom: 20px; }
+            .contenedor-principal { padding: 10px; }
+            .map-container { width: 95%; margin-top: 10px; }
+        }
 
-        .donut-chart { width: 85px; height: 85px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 10px auto; position: relative; }
-        .donut-chart::after { content: ''; position: absolute; width: 65px; height: 65px; background: #2a2a2a; border-radius: 50%; }
-        .donut-text { position: relative; z-index: 1; font-weight: bold; font-size: 1.3em; }
+        .led { width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.3s; }
+        .led-off { background: #2ecc71; color: #000; box-shadow: 0 0 10px #2ecc71; }
+        .led-on { background: #e74c3c; color: #fff; box-shadow: 0 0 10px #e74c3c; }
 
-        .big-num { font-size: 3em; font-weight: bold; margin: 0; line-height: 1; }
-        .rec-item { display: inline-flex; align-items: center; background: #1a1a1a; padding: 4px 8px; border-radius: 8px; margin: 0 3px; border: 1px solid #333; }
-        .rec-val { font-weight: bold; color: #2ecc71; margin-right: 4px; }
-        
+        .zona-interactiva { position: absolute; cursor: pointer; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid; }
+        .zona-activa { box-shadow: 0 0 20px rgba(255,255,255,0.2); border-width: 4px !important; }
+
+        .stat-box { background: #2a2a2a; padding: 15px; border-radius: 15px; margin-bottom: 12px; border-top: 4px solid #444; }
+        .mini-box { background: #252525; padding: 10px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #444; cursor: pointer; }
+
+        .donut-chart { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 10px auto; position: relative; }
+        .donut-chart::after { content: ''; position: absolute; width: 55px; height: 55px; background: #2a2a2a; border-radius: 50%; }
+        .donut-text { position: relative; z-index: 1; font-weight: bold; }
+
         .btn-logout {
-            margin-top: auto; padding: 12px; background: #e74c3c; color: white; 
-            text-align: center; text-decoration: none; border-radius: 10px; font-weight: bold;
+            margin-top: 20px; padding: 12px; background: rgba(231, 76, 60, 0.2); color: #e74c3c; 
+            text-align: center; text-decoration: none; border-radius: 10px; font-weight: bold; border: 1px solid #e74c3c;
         }
     </style>
 </head>
@@ -132,29 +93,29 @@
             <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
             
             <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%;" onclick="mostrarInfo('Zona Central')">
-                <span class="nombre-zona-mapa" style="color:var(--central);">Zona Central</span>
-                <div style="display:flex; gap:10px;"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
+                <span style="font-size:0.8em; color:var(--central); font-weight:bold; margin-bottom:5px;">ZONA CENTRAL</span>
+                <div style="display:flex; gap:8px;"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
             </div>
             
             <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Norte')">
-                <span class="nombre-zona-mapa" style="color:var(--norte);">Zona Norte</span>
-                <div style="display:flex; gap:10px;"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
+                <span style="font-size:0.8em; color:var(--norte); font-weight:bold; margin-bottom:5px;">ZONA NORTE</span>
+                <div style="display:flex; gap:8px;"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
             </div>
             
             <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%;" onclick="mostrarInfo('Zona Sur')">
-                <span class="nombre-zona-mapa" style="color:var(--sur);">Zona Sur</span>
-                <div style="display:flex; gap:10px;"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
+                <span style="font-size:0.8em; color:var(--sur); font-weight:bold; margin-bottom:5px;">ZONA SUR</span>
+                <div style="display:flex; gap:8px;"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
             </div>
         </div>
     </div>
 
     <div class="side-panel">
-        <h2 style="margin:0 0 20px 0; font-size: 1.6em; text-align: center;">Nexus <span style="color:var(--norte); font-weight:300;">Smart</span></h2>
+        <h2 style="margin:0 0 20px 0; font-size: 1.4em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
         
-        <h3 style="font-size: 0.8em; color: #666; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 1px;">Estado General</h3>
+        <h3 style="font-size: 0.7em; color: #888; text-transform: uppercase; margin-bottom: 10px;">Zonas Disponibles</h3>
         <div id="otras-zonas"></div>
 
-        <h3 style="font-size: 0.8em; color: #666; text-transform: uppercase; margin: 15px 0 10px 0; letter-spacing: 1px;">Detalle Seleccionado</h3>
+        <h3 style="font-size: 0.7em; color: #888; text-transform: uppercase; margin: 15px 0 10px 0;">Detalle de Ocupación</h3>
         <div id="zona-seleccionada"></div>
 
         <div id="aviso-zona"></div>
@@ -193,29 +154,20 @@
                 let lB = data[zC.pines[1]] === 0 ? "🚗" : "";
                 htmlOtras += `
                     <div class="mini-box" style="border-left-color: ${zC.color}" onclick="mostrarInfo('${z}')">
-                        <span style="font-weight:bold; color:#bbb; font-size: 0.9em;">${z}</span>
-                        <div>
-                            <span style="color:#2ecc71; font-size:1.1em;">${lA} ${lB}</span>
-                        </div>
+                        <span style="font-weight:bold; color:#bbb; font-size: 0.8em;">${z}</span>
+                        <div style="font-size:1em;">${lA} ${lB}</div>
                     </div>`;
             }
             document.getElementById('otras-zonas').innerHTML = htmlOtras;
 
             const c = CONFIG[zonaActual];
-            const libA = data[c.pines[0]] === 0 ? 1 : 0;
-            const libB = data[c.pines[1]] === 0 ? 1 : 0;
             const porc = (( (data[c.pines[0]] === 1 ? 1:0) + (data[c.pines[1]] === 1 ? 1:0) ) / 2) * 100;
 
             document.getElementById('zona-seleccionada').innerHTML = `
                 <div class="stat-box" style="border-top-color: ${c.color}">
-                    <div style="text-align:center; font-size:1.3em; font-weight:bold; color:${c.color}; margin-bottom: 5px;">${zonaActual}</div>
-                    <div style="text-align:center; font-size:0.7em; color:#888; text-transform:uppercase; letter-spacing:1px;">Ocupación</div>
+                    <div style="text-align:center; font-weight:bold; color:${c.color}; margin-bottom:10px;">${zonaActual}</div>
                     <div class="donut-chart" style="background: conic-gradient(${c.color} ${porc}%, #444 0);">
                         <span class="donut-text">${porc}%</span>
-                    </div>
-                    <div style="display:flex; justify-content: space-around; text-align:center;">
-                        <div><span style="font-size:0.65em; color:#888;">LIBRE</span><br><span class="big-num">${libB}</span></div>
-                        <div><span style="font-size:0.65em; color:#888;">ADAPTADA</span><br><span class="big-num" style="color:#3498db">${libA}</span></div>
                     </div>
                 </div>`;
             gestionarRecomendacion(data);
@@ -224,31 +176,13 @@
         function gestionarRecomendacion(data) {
             let aviso = document.getElementById('aviso-zona');
             if (data[CONFIG[zonaActual].pines[0]] === 1 && data[CONFIG[zonaActual].pines[1]] === 1) {
-                let mejor = ""; let maxL = -1; let hRec = "";
-                for (let z in CONFIG) {
-                    if (z === zonaActual) continue;
-                    let a = data[CONFIG[z].pines[0]] === 0 ? 1 : 0;
-                    let b = data[CONFIG[z].pines[1]] === 0 ? 1 : 0;
-                    if ((a+b) > maxL) {
-                        maxL = a+b; mejor = z;
-                        hRec = (a > 0 ? `<span class="rec-item"><span class="rec-val">${a}</span>♿</span>` : "") +
-                               (b > 0 ? `<span class="rec-item"><span class="rec-val">${b}</span>🚗</span>` : "");
-                    }
-                }
-                if (maxL > 0) {
-                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center;">
-                        <b style="color:#e74c3c; font-size:0.85em; text-transform:uppercase;">⚠️ ${zonaActual.toUpperCase()} COMPLETA</b><br>
-                        <p style="margin:10px 0 0 0; font-size:0.9em;">Se recomienda ir a la <b>${mejor}</b>:<br><br>${hRec}</p>
-                    </div>`;
-                } else {
-                    aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; text-align:center; font-weight:bold; font-size:0.9em;">🚨 PARKING COMPLETO</div>`;
-                }
+                aviso.innerHTML = `<div class="stat-box" style="border-top-color:#e74c3c; background:rgba(231,76,60,0.1); text-align:center; font-size:0.8em;">
+                    <b style="color:#e74c3c;">⚠️ ZONA COMPLETA</b><br>Busque plaza en otra zona.
+                </div>`;
             } else { aviso.innerHTML = ""; }
         }
 
-        function refrescar() { 
-            fetch('/status').then(r => r.json()).then(d => actualizarInterfaz(d)).catch(() => {}); 
-        }
+        function refrescar() { fetch('/status').then(r => r.json()).then(d => actualizarInterfaz(d)).catch(() => {}); }
         setInterval(refrescar, 2000);
     </script>
 </body>
