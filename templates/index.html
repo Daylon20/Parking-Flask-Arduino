@@ -36,7 +36,6 @@
             padding: 20px; background: #111;
         }
         
-        /* TAMAÑO DE IMAGEN AJUSTADO (PUNTO MEDIO) */
         .map-container { 
             position: relative; background: #222; border-radius: 15px; 
             width: 90%; max-width: 850px; 
@@ -68,6 +67,26 @@
 
         .zona-interactiva { position: absolute; cursor: pointer; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid; transition: 0.3s; }
         
+        /* ESTILO PARA EL ICONO "P" EN LA ESQUINA */
+        .parking-corner-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #3498db; /* Azul Parking estándar */
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
         #zona-norte.zona-activa { box-shadow: 0 0 20px var(--norte); border-color: var(--norte); border-width: 4px; }
         #zona-sur.zona-activa { box-shadow: 0 0 20px var(--sur); border-color: var(--sur); border-width: 4px; }
         #zona-central.zona-activa { box-shadow: 0 0 20px var(--central); border-color: var(--central); border-width: 4px; }
@@ -99,17 +118,17 @@
             <img src="{{ url_for('static', filename='img/logo_parking.jpg') }}" class="map-image">
             
             <div id="zona-central" class="zona-interactiva" style="top:5%; left:3%; width:44%; height:90%; border-color: var(--central);" onclick="mostrarInfo('Zona Central')">
-                <span style="font-size:0.8em; color:var(--central); font-weight:bold; margin-bottom:5px;">ZONA CENTRAL</span>
+                <div class="parking-corner-icon">P</div> <span style="font-size:0.8em; color:var(--central); font-weight:bold; margin-bottom:5px;">ZONA CENTRAL</span>
                 <div style="display:flex; gap:8px;"><div id="led-p6" class="led">♿</div><div id="led-p7" class="led">🚗</div></div>
             </div>
             
             <div id="zona-norte" class="zona-interactiva" style="top:5%; left:52%; width:45%; height:43%; border-color: var(--norte);" onclick="mostrarInfo('Zona Norte')">
-                <span style="font-size:0.8em; color:var(--norte); font-weight:bold; margin-bottom:5px;">ZONA NORTE</span>
+                <div class="parking-corner-icon">P</div> <span style="font-size:0.8em; color:var(--norte); font-weight:bold; margin-bottom:5px;">ZONA NORTE</span>
                 <div style="display:flex; gap:8px;"><div id="led-p2" class="led">♿</div><div id="led-p3" class="led">🚗</div></div>
             </div>
             
             <div id="zona-sur" class="zona-interactiva" style="top:52%; left:52%; width:45%; height:43%; border-color: var(--sur);" onclick="mostrarInfo('Zona Sur')">
-                <span style="font-size:0.8em; color:var(--sur); font-weight:bold; margin-bottom:5px;">ZONA SUR</span>
+                <div class="parking-corner-icon">P</div> <span style="font-size:0.8em; color:var(--sur); font-weight:bold; margin-bottom:5px;">ZONA SUR</span>
                 <div style="display:flex; gap:8px;"><div id="led-p4" class="led">♿</div><div id="led-p5" class="led">🚗</div></div>
             </div>
         </div>
@@ -118,6 +137,24 @@
     <div class="side-panel">
         <div class="contenido-panel">
             <h2 style="margin:0 0 20px 0; font-size: 1.4em; text-align: center;">Parking <span style="color:var(--norte); font-weight:300;">Inteligente</span></h2>
+            
+            <div class="stat-box" style="text-align:center;">
+                <div style="font-size:0.8em; color:#888; margin-bottom:15px; text-transform:uppercase;">Plazas Disponibles</div>
+                <div style="display:flex; justify-content:space-around; align-items:center;">
+                    <div style="display:flex; flex-direction:column; align-items:center;">
+                        <div style="font-size:1.5em; margin-bottom:5px;">🚗</div>
+                        <span style="font-size:1.6em; font-weight:bold; color:#2ecc71;" id="count-normal">0</span>
+                    </div>
+                    <div style="width:1px; height:40px; background:#444;"></div>
+                    <div style="display:flex; flex-direction:column; align-items:center;">
+                        <div style="font-size:1.5em; margin-bottom:5px;">♿</div>
+                        <span style="font-size:1.6em; font-weight:bold; color:#3498db;" id="count-adap">0</span>
+                    </div>
+                </div>
+                <div style="margin-top:15px; font-size:0.9em; border-top:1px solid #444; padding-top:10px;">
+                    Total Libres: <span id="count-total" style="color:white; font-weight:bold;">0</span> / 6
+                </div>
+            </div>
             
             <h3 style="font-size: 0.7em; color: #888; text-transform: uppercase; margin-bottom: 10px;">Zonas Disponibles</h3>
             <div id="otras-zonas"></div>
@@ -149,6 +186,15 @@
 
         function actualizarInterfaz(data) {
             estadosPines = data;
+            
+            // Lógica de conteo intacta
+            let libresAdap = (data.p2 === 0 ? 1 : 0) + (data.p4 === 0 ? 1 : 0) + (data.p6 === 0 ? 1 : 0);
+            let libresNorm = (data.p3 === 0 ? 1 : 0) + (data.p5 === 0 ? 1 : 0) + (data.p7 === 0 ? 1 : 0);
+            
+            document.getElementById('count-adap').innerText = libresAdap;
+            document.getElementById('count-normal').innerText = libresNorm;
+            document.getElementById('count-total').innerText = (libresAdap + libresNorm);
+
             for (let pin in data) {
                 let led = document.getElementById('led-' + pin);
                 if (led) led.className = data[pin] === 1 ? 'led led-on' : 'led led-off';
