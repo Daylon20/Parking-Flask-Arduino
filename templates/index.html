@@ -236,7 +236,8 @@
         }
 
         function refrescar() { fetch('/status').then(r => r.json()).then(d => actualizarInterfaz(d)).catch(() => {}); }
-        setInterval(refrescar, 2000);
+        setInterval(refrescar, 500);
     </script>
 </body>
 </html>
+
